@@ -8,8 +8,8 @@
 #include "Block.h"
 #include "HashTuples.h"
 
-constexpr int nBlockSide = 32;
-constexpr int nBlockHeight = 3;
+constexpr int nBlockSide = 1;
+constexpr int nBlockHeight = 1;
 
 class PieceOfWorld {
 

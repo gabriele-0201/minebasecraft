@@ -6,7 +6,7 @@
 #include "Enums.h"
 
 namespace Block {
-    constexpr unsigned int DIMBLOCK = 10;
+    constexpr float DIMBLOCK = 0.3;
     // MAYBE A LOT STUPID
     // if I store the vertex of a face in clockwise order and all consecutive THAN i could find a patter
     // but this is not our case, I will not have consecutive vertecies

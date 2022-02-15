@@ -5,6 +5,12 @@
 
 using std::string;
 
+/*
+Shader::Shader() {
+
+}
+*/
+
 Shader::Shader(const string& _filePath) : filePath{_filePath}, rendererId{0} {
     ShaderProgramSource source = parseShader(filePath);
     GLCall(rendererId = createShader(source.vertexSource, source.fragmentSource));

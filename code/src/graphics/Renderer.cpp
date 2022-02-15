@@ -5,26 +5,6 @@
 
 Renderer::Renderer(World& _w, Player& _p) : w{_w}, p{_p} {
 
-}
-
-Renderer::~Renderer() {}
-
-/*
-void Renderer::draw(const VertexArray& va, const ElementBuffer& ib, const Shader& shader) const {
-
-    shader.bind();
-    va.bind();
-    ib.bind(); 
-    
-    // And for now only triangles
-    GLCall(glDrawElements(GL_TRIANGLES, ib.getCount(), GL_UNSIGNED_INT, nullptr));
-
-    //GLCall(glDrawElements(GL_LINES, ib.getCount(), GL_UNSIGNED_INT, nullptr));
-}
-*/
-
-void Renderer::draw() {
-
     vb = {&(w.getAllVertecies()[0]), 8 * 4 * sizeof(float)};
 
     layout.push<float>(3);
@@ -52,8 +32,34 @@ void Renderer::draw() {
 
     eb = {tmpIndeces, 36};
 
-    Shader shader ("../code/program.shader");
+    // TODO solve this problem with the copy of the shader (do not know why but the bind goes away)
+    //shader = {"../code/program.shader"};
+
+
+}
+
+Renderer::~Renderer() {}
+
+/*
+void Renderer::draw(const VertexArray& va, const ElementBuffer& ib, const Shader& shader) const {
+
     shader.bind();
+    va.bind();
+    ib.bind(); 
+    
+    // And for now only triangles
+    GLCall(glDrawElements(GL_TRIANGLES, ib.getCount(), GL_UNSIGNED_INT, nullptr));
+
+    //GLCall(glDrawElements(GL_LINES, ib.getCount(), GL_UNSIGNED_INT, nullptr));
+}
+*/
+
+void Renderer::draw() {
+
+    Shader shader("../code/program.shader");
+    shader.bind();
+    va.bind();
+    eb.bind();
 
     //Texture texture("../minion.jpg");
     //texture.bind();

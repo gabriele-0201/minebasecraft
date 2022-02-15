@@ -8,10 +8,9 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win}{
     // For now only one piece 
     terrain[{0,0}] = PieceOfWorld({0,0});
 
-    //for(float f : terrain[{0, 0}].getData())
-        //std::cout << f <<std::endl;
-
-    
+    std::cout << "vertecies" << std::endl;
+    for(float f : terrain[{0, 0}].getVertecies())
+        std::cout << f <<std::endl;
 
 }
 

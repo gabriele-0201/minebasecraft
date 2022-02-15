@@ -32,6 +32,7 @@ class Shader {
 
     public:
 
+        //Shader();
         Shader(const std::string& _filePath);
         ~Shader();
 

@@ -22,6 +22,7 @@ class Renderer {
         VertexBuffer vb;
         VertexBufferLayout layout;
         ElementBuffer eb;
+        //Shader shader;
 
     public:
     
