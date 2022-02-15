@@ -3,6 +3,10 @@
 
 #include "ElementBuffer.h"
 
+ElementBuffer::ElementBuffer () {
+
+}
+
 ElementBuffer::ElementBuffer(unsigned int* data, unsigned int _count) : count{_count} {
     GLCall(glGenBuffers(1, &id));
     GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id));

@@ -15,6 +15,7 @@ class ElementBuffer {
     public:
 
 
+        ElementBuffer();
         ElementBuffer(unsigned int* data, unsigned int count);
         ~ElementBuffer();
 

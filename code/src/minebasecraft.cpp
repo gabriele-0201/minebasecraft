@@ -1,20 +1,26 @@
 #include "World.h"
-//#include "GLC.h"
+#include "Player.h"
+#include "GLC.h"
+#include "Renderer.h"
+
+Player* p = nullptr;
+
+void mouseMovCbGeneral(GLFWwindow* window, double xpos, double ypos) {
+    ASSERT(p)
+    p -> mouseMovCb(xpos, ypos);
+}
 
 int main(void) {
 
-    /*
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-    glfwSetCursorPosCallback(window, func);
-    glfwSetScrollCallback(window, Camera::mouseScrollCb);
-    */
 
     // Setting al the start stuff
 
     GLFWwindow* window;
 
     World world {window, 1};
+    Player player {window};
+    p = &player;
+
 
     int winHeight = 480;
     int winWidth = 640 ;
@@ -49,6 +55,14 @@ int main(void) {
       std::cout << "Error " << glewGetErrorString(err) <<std::endl;
     }
 
+    // THOSE maybe will go in the RENDERER
+
+    Renderer renderer {world, player};
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    
+    glfwSetCursorPosCallback(window, mouseMovCbGeneral);
+    //glfwSetScrollCallback(window, mouseMovCb);
 
     /* Loop until the user closes the window */
     // GameLoop
@@ -57,17 +71,9 @@ int main(void) {
         /* Render here */
         GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
-        shader.bind();
         //shader.setUnifor4f("uColor", r, 0.0f, 0.0f, 0.5f);
 
-        renderer.draw(va, ib, shader);
-
-        if(r > 1.0f)
-            incr *= -1;
-        else if(r < 0.0f)
-            incr *= -1;
-
-        r += incr;
+        renderer.draw();
 
         /* Swap front and back buffers */
         GLCall(glfwSwapBuffers(window));

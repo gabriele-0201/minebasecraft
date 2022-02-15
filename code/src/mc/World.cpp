@@ -12,44 +12,34 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win}{
         //std::cout << f <<std::endl;
 
     
-    VertexArray va{};
-
-    VertexBuffer vb{pos, 4 * 4 * sizeof(float)};
-
-    VertexBufferLayout layout;
-    layout.push<float>(2);
-    layout.push<float>(2);
-    va.addBuffer(vb, layout);
-    //to be insered in the main loop, chek the code of the cherno
-
-    IndexBuffer ib {indeces, 6};
-    //IndexBuffer ib {indeces2, 6};
-
-    Shader shader ("../program.shader");
-    shader.bind();
-
-    Texture texture("../minion.jpg");
-    texture.bind();
-
-    // Send a integer uniform to the shader and it is the id we want to sample
-    shader.setUnifor1i("uTexture", 0);
-
-    va.unbind();
-    shader.unbind();
-    vb.unbind();
-    ib.unbind();
-
-    Renderer renderer {};
-
-    float r = 0.0f;
-    float incr = 0.01f;
 
 }
 
-void World::render() {
 
-    
+std::vector<std::vector<float>> World::getAllVertecies() {
 
+    std::vector<std::vector<float>> buffers{};
+    buffers.push_back(std::vector<float> {});
+
+    // someway reduce the chunks that will be calculed
+    for(auto itr = terrain.begin(); itr != terrain.end(); ++itr) {
+       buffers.push_back((itr -> second).getVertecies());
+    }
+
+    return buffers;
+}
+
+std::vector<std::vector<unsigned int>> World::getAllIndicies() {
+
+    std::vector<std::vector<unsigned int>> buffers{};
+    buffers.push_back(std::vector<unsigned int> {});
+
+    // someway reduce the chunks that will be calculed
+    for(auto itr = terrain.begin(); itr != terrain.end(); ++itr) {
+       buffers.push_back((itr -> second).getIndecies());
+    }
+
+    return buffers;
 }
 
 // This will update also the chunks that will be rendered each frame

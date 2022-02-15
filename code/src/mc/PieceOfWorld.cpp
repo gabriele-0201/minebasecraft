@@ -24,7 +24,8 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos) : pos{_pos} {
 
 }
 
-std::vector<float> PieceOfWorld::getData () const {
+std::vector<float> PieceOfWorld::getVertecies() const {
+    /*
     std::vector<float> data{};
 
     for(int z = 0; z < nBlockHeight; ++z) {
@@ -41,6 +42,12 @@ std::vector<float> PieceOfWorld::getData () const {
         }
     }
     return data;
+    */
+    return {1,2};
+}
+
+std::vector<unsigned int> PieceOfWorld::getIndecies() const {
+    return {1, 2};
 }
 
 

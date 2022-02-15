@@ -1,5 +1,5 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef PLAYER_H
+#define PLAYER_H
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -26,9 +26,10 @@ class Player {
         float yaw = -90;
         float pitch = 0;
         
-        float fov = 45.0f;
         
     public: 
+
+        const float fov = 45.0f;
 
         /**
          * Default up vector is the y normalized
@@ -37,18 +38,17 @@ class Player {
 
         glm::mat4 inline getViewMatrix() const { return viewMatrix; };
 
-
         void processKeyInput(GLFWwindow* window);
 
         /**
          * Mouse movement callback
          */
-        void mouseMovCb(GLFWwindow* window, double xpos, double ypos);
+        void mouseMovCb(double xpos, double ypos);
 
         /**
          * mouse scroll callback
          */
-        static void mouseScrollCb(GLFWwindow* window, double xoffset, double yoffset);
+        //void mouseScrollCb(GLFWwindow* window, double xoffset, double yoffset);
         
         
 

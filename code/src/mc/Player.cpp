@@ -1,5 +1,5 @@
-#ifndef CAMERA_CPP
-#define CAMERA_CPP
+#ifndef PLAYER_CPP
+#define PLAYER_CPP
 
 #include "Player.h"
 
@@ -16,8 +16,6 @@ Player::Player(GLFWwindow* window, glm::vec3 up) {
     lasty = 300.0f;
     yaw = -90;
     pitch = 0;
-        
-    fov = 45.0f; 
 }
 
 void Player::processKeyInput(GLFWwindow* window) {
@@ -34,7 +32,7 @@ void Player::processKeyInput(GLFWwindow* window) {
 
 }
 
-void Player::mouseMovCb(GLFWwindow* window, double xpos, double ypos) {
+void Player::mouseMovCb(double xpos, double ypos) {
     float offsetx = xpos - lastx;
     float offsety = lasty - ypos;
     lastx = xpos;
@@ -58,8 +56,13 @@ void Player::mouseMovCb(GLFWwindow* window, double xpos, double ypos) {
     direction.y = sin(glm::radians(pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
     cameraFront = glm::normalize(direction);
+
+    // update viewMatrix
+
+    viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 }
 
+/*
 void Player::mouseScrollCb(GLFWwindow* window, double xoffset, double yoffset) {
     fov += (float)yoffset;
     if(fov < 1)
@@ -67,5 +70,6 @@ void Player::mouseScrollCb(GLFWwindow* window, double xoffset, double yoffset) {
     if(fov > 45)
         fov = 45;
 }
+*/
         
 #endif
