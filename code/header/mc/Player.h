@@ -18,7 +18,6 @@ class Player {
         glm::vec3 cameraUp;
         
         float deltaTime = 0.0f;
-        float lastFrame = 0.0f;
         
         // mouse stuff
         float lastx = 400.0f;
@@ -44,6 +43,9 @@ class Player {
          * Mouse movement callback
          */
         void mouseMovCb(double xpos, double ypos);
+
+        void setDeltaTime(float t);
+        float getDeltaTime();
 
         /**
          * mouse scroll callback

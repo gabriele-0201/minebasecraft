@@ -3,6 +3,7 @@
 
 #include<GL/glew.h>
 #include<iostream>
+#include<memory>
 
 #include "VertexArray.h"
 #include "Shader.h"
@@ -17,11 +18,18 @@ class Renderer {
 
         World& w;
         Player& p;
+        glm::mat4 proj;
 
-        VertexArray va;
-        VertexBuffer vb;
-        VertexBufferLayout layout;
-        ElementBuffer eb;
+        //std::unique_ptr<VertexArray> va;
+        //std::unique_ptr<VertexBuffer> vb;
+        //std::unique_ptr<VertexBufferLayout> layout;
+        //std::unique_ptr<ElementBuffer> eb;
+        std::unique_ptr<Shader> shader;
+
+        //VertexArray va;
+        //VertexBuffer vb;
+        //VertexBufferLayout layout;
+        //ElementBuffer eb;
         //Shader shader;
 
     public:

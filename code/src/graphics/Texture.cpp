@@ -3,8 +3,10 @@
 
 #include "Texture.h"
 
+Texture::Texture() : defCostruct{true} {}
+
 Texture::Texture (const std::string& path) 
-    : id{0}, filePath{path}, width{0}, height{0}, localBuffer{nullptr} {
+    : id{0}, filePath{path}, width{0}, height{0}, localBuffer{nullptr}, defCostruct{false} {
 
         GLCall(glGenTextures(1, &id));
         GLCall(glBindTexture(GL_TEXTURE_2D, id));
@@ -30,7 +32,9 @@ Texture::Texture (const std::string& path)
 }
 
 Texture::~Texture() {
-    GLCall(glDeleteTextures(1, &id));
+    // NOT delete the buffer if I did not created it (default constructor used)
+    if(!defCostruct)
+        GLCall(glDeleteTextures(1, &id));
 }
 
 void Texture::bind(unsigned int slot) const {

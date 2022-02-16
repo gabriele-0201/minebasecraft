@@ -19,8 +19,27 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos) : pos{_pos} {
 
             }
         }
-
     }
+
+    va = std::unique_ptr<VertexArray>{ new VertexArray{} };
+
+    vb = std::unique_ptr<VertexBuffer>{ new VertexBuffer{} };
+    eb = std::unique_ptr<ElementBuffer>{ new ElementBuffer{&(Block::indeces[0]), 36} };
+    eb -> bind();
+    
+    layout = std::unique_ptr<VertexBufferLayout> { new VertexBufferLayout{} };
+    layout -> push<float>(3);
+
+    updateBuffers();
+}
+
+void PieceOfWorld::updateBuffers() {
+
+    vb -> updateData(&(getVertecies()[0]), 8 * 3 * sizeof(float));
+    va -> bindVb(*vb, *layout);
+
+    // update also the idex buffer in the future (when I will render more than one cube)
+    eb -> bind();
 
 }
 
@@ -32,7 +51,6 @@ std::vector<float> PieceOfWorld::getVertecies() const {
         for(int x = 0; x < nBlockSide; ++x) {
 
             for(int y = 0; y < nBlockSide; ++y) {
-
 
                 std::vector<float> vertecies = getVertecies(x, y, z);
 

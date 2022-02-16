@@ -10,7 +10,6 @@ Player::Player(GLFWwindow* window, glm::vec3 up) {
     cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
         
     deltaTime = 0.0f;
-    lastFrame = 0.0f;
         
     lastx = 400.0f;
     lasty = 300.0f;
@@ -60,6 +59,14 @@ void Player::mouseMovCb(double xpos, double ypos) {
     // update viewMatrix
 
     viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+}
+
+void Player::setDeltaTime (float t) {
+    deltaTime = t;
+}
+
+float Player::getDeltaTime() {
+    return deltaTime;
 }
 
 /*

@@ -3,10 +3,13 @@
 
 #include <unordered_map>
 #include <vector>
+#include <memory>
 
 #include "Enums.h"
 #include "Block.h"
 #include "HashTuples.h"
+#include "VertexArray.h"
+#include "ElementBuffer.h"
 
 constexpr int nBlockSide = 1;
 constexpr int nBlockHeight = 1;
@@ -29,6 +32,13 @@ class PieceOfWorld {
         //std::vector<float> getVertecies(float xCenter, float yCenter, float zCenter) const;
         std::vector<float> getVertecies(unsigned int, unsigned int, unsigned int) const;
 
+        std::shared_ptr<VertexArray> va;
+        std::shared_ptr<VertexBuffer> vb;
+        std::shared_ptr<VertexBufferLayout> layout;
+        std::shared_ptr<ElementBuffer> eb;
+
+        void updateBuffers();
+
     public:
 
         // Some way to get NOISE
@@ -38,8 +48,10 @@ class PieceOfWorld {
         std::vector<float> getVertecies() const;
         std::vector<unsigned int> getIndecies() const;
 
-        std::pair<int, int> inline getPos() { return pos; }
+        std::pair<int, int> inline getPos() { return pos; };
 
+        inline shared_ptr<VertexArray> getVertexArray() { return va; };
+        inline shared_ptr<ElementBuffer> () { return eb; };
 
 };
 

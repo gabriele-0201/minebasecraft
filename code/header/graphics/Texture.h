@@ -8,12 +8,17 @@
 
 class Texture {
     private:
+
+        // Keep track if the Object is created with a default constructor
+        bool defCostruct;
+
         unsigned int id;
         std::string filePath;
         unsigned char* localBuffer;
         int width, height, BPP;
 
     public:
+        Texture();
         Texture(const std::string& path);
         ~Texture();
 

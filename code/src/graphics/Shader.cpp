@@ -5,18 +5,13 @@
 
 using std::string;
 
-/*
-Shader::Shader() {
-
-}
-*/
-
-Shader::Shader(const string& _filePath) : filePath{_filePath}, rendererId{0} {
+Shader::Shader(const string& _filePath) : filePath{_filePath}, rendererId{0}, defCostruct{false} {
     ShaderProgramSource source = parseShader(filePath);
     GLCall(rendererId = createShader(source.vertexSource, source.fragmentSource));
 }
 
 Shader::~Shader() {
+    std::cout << "DIO MEO" <<std::endl;
     GLCall(glDeleteProgram(rendererId));
 }
 

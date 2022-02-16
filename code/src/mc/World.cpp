@@ -8,21 +8,49 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win}{
     // For now only one piece 
     terrain[{0,0}] = PieceOfWorld({0,0});
 
-    std::cout << "vertecies" << std::endl;
-    for(float f : terrain[{0, 0}].getVertecies())
-        std::cout << f <<std::endl;
+}
+
+std::vector<VertexArray&> World::getAllVertexArrays() {
+
+    std::vector<VertexArray&> arrays{};
+    //buffers.push_back(std::vector<float> {});
+
+    // someway reduce the chunks that will be calculed
+    for(auto itr = terrain.begin(); itr != terrain.end(); ++itr) {
+        arrays.push_back((itr -> second).getVertexArray());
+    }
+
+    return arrays;
+
+}
+
+std::vector<ElementBuffer> World::getAllElementBuffers() {
+
+    std::vector<ElementBuffer> arrays{};
+    //buffers.push_back(std::vector<float> {});
+
+    // someway reduce the chunks that will be calculed
+    for(auto itr = terrain.begin(); itr != terrain.end(); ++itr) {
+        arrays.push_back((itr -> second).getElementBuffer());
+    }
+
+    return arrays;
 
 }
 
 
-std::vector<std::vector<float>> World::getAllVertecies() {
 
-    std::vector<std::vector<float>> buffers{};
-    buffers.push_back(std::vector<float> {});
+std::vector<float> World::getAllVertecies() {
+
+    std::vector<float> buffers{};
+    //buffers.push_back(std::vector<float> {});
 
     // someway reduce the chunks that will be calculed
     for(auto itr = terrain.begin(); itr != terrain.end(); ++itr) {
-       buffers.push_back((itr -> second).getVertecies());
+
+        std::vector<float> vertecies = (itr -> second).getVertecies();
+
+        buffers.insert(buffers.end(), vertecies.begin(), vertecies.end());
     }
 
     return buffers;

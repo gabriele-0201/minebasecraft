@@ -59,18 +59,29 @@ int main(void) {
 
     Renderer renderer {world, player};
 
+    // REMOVE in the future
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     
     glfwSetCursorPosCallback(window, mouseMovCbGeneral);
     //glfwSetScrollCallback(window, mouseMovCb);
 
+    glEnable(GL_DEPTH_TEST);
+    float lastFrame = 0.0f;
+
     /* Loop until the user closes the window */
     // GameLoop
+
     while (!glfwWindowShouldClose(window))
     {
-        /* Render here */
-        GLCall(glClear(GL_COLOR_BUFFER_BIT));
+        float currentTime = glfwGetTime();
+        player.setDeltaTime(currentTime - lastFrame);
+        lastFrame = currentTime;
 
+        /* Render here */
+        GLCall(glClearColor(0.0f, 0.2f, 0.2f, 1.0f));
+        GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
+        player.processKeyInput(window);
         //shader.setUnifor4f("uColor", r, 0.0f, 0.0f, 0.5f);
 
         renderer.draw();

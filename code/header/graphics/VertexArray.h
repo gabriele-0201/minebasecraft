@@ -7,7 +7,6 @@
 class VertexArray {
 
     private:
-
         unsigned int id;
 
     public:
@@ -18,7 +17,7 @@ class VertexArray {
         /**
          * Maybe usefull but when some change but I do not want to recreate the entire vertex array
          */
-        void bindVb(VertexBuffer vb, VertexBufferLayout layout);
+        void bindVb(VertexBuffer& vb, VertexBufferLayout& layout);
 
         void bind() const;
         void unbind() const;

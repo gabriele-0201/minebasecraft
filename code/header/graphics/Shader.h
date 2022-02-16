@@ -19,6 +19,9 @@ class Shader {
 
     private:
 
+        // Keep track if the Object is created with a default constructor
+        bool defCostruct;
+
         std::string filePath;
         unsigned int rendererId;
         int getUniformLocation(const std::string& name);
@@ -34,7 +37,11 @@ class Shader {
 
         //Shader();
         Shader(const std::string& _filePath);
+        // Usefull  I have to make anothor way to delete the program from the gpu
         ~Shader();
+
+        Shader(const Shader&) = delete;
+        void operator=(const Shader&) = delete;
 
         void bind() const;
         void unbind() const;
