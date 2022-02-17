@@ -45,8 +45,8 @@ class World {
         void addBlock(TypeOfBlock);
 
 
-        std::vector< shared_ptr<VertexArray> > getAllVertexArrays();
-        std::vector<ElementBuffer&> getAllElementBuffers();
+        std::vector<std::shared_ptr<VertexArray> > getAllVertexArrays();
+        std::vector<std::shared_ptr<ElementBuffer> > getAllElementBuffers();
 };
 
 #endif

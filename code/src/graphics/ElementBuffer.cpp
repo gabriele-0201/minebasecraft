@@ -3,11 +3,11 @@
 
 #include "ElementBuffer.h"
 
-ElementBuffer::ElementBuffer () : defCostruct{true} {
+ElementBuffer::ElementBuffer () {
 
 }
 
-ElementBuffer::ElementBuffer(unsigned int* data, unsigned int _count) : count{_count}, defCostruct{true}  {
+ElementBuffer::ElementBuffer(unsigned int* data, unsigned int _count) : count{_count} {
     GLCall(glGenBuffers(1, &id));
     GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id));
     GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_STATIC_DRAW));
@@ -23,9 +23,13 @@ void ElementBuffer::unbind() const {
 }
 
 ElementBuffer::~ElementBuffer() {
-    // NOT delete the buffer if I did not created it (default constructor used)
-    if(!defCostruct)
-        GLCall(glDeleteBuffers(1, &id));
+    GLCall(glDeleteBuffers(1, &id));
 };
+
+void ElementBuffer::updateData(unsigned int* data, unsigned int _count) {
+    count = _count;
+    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id));
+    GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_DYNAMIC_DRAW));
+}
 
 #endif

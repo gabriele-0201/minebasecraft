@@ -11,7 +11,7 @@ Shader::Shader(const string& _filePath) : filePath{_filePath}, rendererId{0}, de
 }
 
 Shader::~Shader() {
-    std::cout << "DIO MEO" <<std::endl;
+    //std::cout << "DIO MEO" <<std::endl;
     GLCall(glDeleteProgram(rendererId));
 }
 

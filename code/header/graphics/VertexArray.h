@@ -14,6 +14,9 @@ class VertexArray {
         VertexArray();
         ~VertexArray();
 
+        VertexArray(const VertexArray&) = delete;
+        void operator=(const VertexArray&) = delete;
+
         /**
          * Maybe usefull but when some change but I do not want to recreate the entire vertex array
          */

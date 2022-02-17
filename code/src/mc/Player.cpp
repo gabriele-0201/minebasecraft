@@ -5,15 +5,15 @@
 
 Player::Player(GLFWwindow* window, glm::vec3 up) {
 
-    cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-    cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    cameraPos = glm::vec3(0.0f, 1.0f, 0.0f);
+    cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
     cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
         
     deltaTime = 0.0f;
         
     lastx = 400.0f;
     lasty = 300.0f;
-    yaw = -90;
+    yaw = 0;
     pitch = 0;
 }
 
@@ -29,6 +29,8 @@ void Player::processKeyInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 
+    // update viewMatrix
+    viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 }
 
 void Player::mouseMovCb(double xpos, double ypos) {
@@ -57,7 +59,6 @@ void Player::mouseMovCb(double xpos, double ypos) {
     cameraFront = glm::normalize(direction);
 
     // update viewMatrix
-
     viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 }
 

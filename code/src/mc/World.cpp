@@ -7,12 +7,13 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win}{
 
     // For now only one piece 
     terrain[{0,0}] = PieceOfWorld({0,0});
+    terrain[{0,1}] = PieceOfWorld({0,1});
 
 }
 
-std::vector<VertexArray&> World::getAllVertexArrays() {
+std::vector<std::shared_ptr<VertexArray> > World::getAllVertexArrays() {
 
-    std::vector<VertexArray&> arrays{};
+    std::vector<std::shared_ptr<VertexArray>> arrays{};
     //buffers.push_back(std::vector<float> {});
 
     // someway reduce the chunks that will be calculed
@@ -24,9 +25,9 @@ std::vector<VertexArray&> World::getAllVertexArrays() {
 
 }
 
-std::vector<ElementBuffer> World::getAllElementBuffers() {
+std::vector<std::shared_ptr<ElementBuffer> > World::getAllElementBuffers() {
 
-    std::vector<ElementBuffer> arrays{};
+    std::vector<std::shared_ptr<ElementBuffer>> arrays{};
     //buffers.push_back(std::vector<float> {});
 
     // someway reduce the chunks that will be calculed

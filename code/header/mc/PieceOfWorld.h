@@ -10,15 +10,37 @@
 #include "HashTuples.h"
 #include "VertexArray.h"
 #include "ElementBuffer.h"
+#include "GLC.h"
 
-constexpr int nBlockSide = 1;
+constexpr int nBlockSide = 32;
 constexpr int nBlockHeight = 1;
+constexpr unsigned int ind[] = {
+    0, 1, 2,
+    2, 3, 1,
+    
+    2, 3, 7,
+    7, 6, 2,
+
+    1, 3, 7,
+    7, 5, 1,
+
+    0, 1, 5,
+    5, 4, 0,
+
+    0, 2, 6, 
+    6, 4, 0,
+
+    4, 6, 7,
+    5, 7, 4
+};
 
 class PieceOfWorld {
 
     private:
 
         std::pair<int, int> pos;
+        float xoffset;
+        float zoffset;
         // Remember all the block, all the not specified block is
         std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
         //std::map<std::tuple<int, int, int>, int, HashTuples::hash3tuple> faces;
@@ -29,9 +51,8 @@ class PieceOfWorld {
 
         std::vector<unsigned int> indeces;
 
-        //std::vector<float> getVertecies(float xCenter, float yCenter, float zCenter) const;
-        std::vector<float> getVertecies(unsigned int, unsigned int, unsigned int) const;
-
+        std::vector<float> getVerteciesOfBlock(unsigned int, unsigned int, unsigned int) const;
+        std::vector<unsigned int> getIndecesOfBlock(int counter) const;
         std::shared_ptr<VertexArray> va;
         std::shared_ptr<VertexBuffer> vb;
         std::shared_ptr<VertexBufferLayout> layout;
@@ -50,8 +71,8 @@ class PieceOfWorld {
 
         std::pair<int, int> inline getPos() { return pos; };
 
-        inline shared_ptr<VertexArray> getVertexArray() { return va; };
-        inline shared_ptr<ElementBuffer> () { return eb; };
+        inline std::shared_ptr<VertexArray> getVertexArray() { return va; };
+        inline std::shared_ptr<ElementBuffer> getElementBuffer() { return eb; };
 
 };
 

@@ -17,11 +17,6 @@ int main(void) {
 
     GLFWwindow* window;
 
-    World world {window, 1};
-    Player player {window};
-    p = &player;
-
-
     int winHeight = 480;
     int winWidth = 640 ;
 
@@ -57,6 +52,10 @@ int main(void) {
 
     // THOSE maybe will go in the RENDERER
 
+    World world {window, 1};
+    Player player {window};
+    p = &player;
+
     Renderer renderer {world, player};
 
     // REMOVE in the future
@@ -67,6 +66,10 @@ int main(void) {
 
     glEnable(GL_DEPTH_TEST);
     float lastFrame = 0.0f;
+
+    //glewExperimental = GL_TRUE; 
+    //glewInit();
+
 
     /* Loop until the user closes the window */
     // GameLoop

@@ -9,11 +9,15 @@ PieceOfWorld::PieceOfWorld() {
 
 PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos) : pos{_pos} {
 
-    for(int z = 0; z < nBlockHeight; ++z) {
+    // OFFEST ON THE RENDERING
+    xoffset = pos.first * nBlockSide * Block::DIMBLOCK;
+    zoffset = pos.second * nBlockSide * Block::DIMBLOCK;
+
+    for(int y = 0; y < nBlockHeight; ++y) {
 
         for(int x = 0; x < nBlockSide; ++x) {
 
-            for(int y = 0; y < nBlockSide; ++y) {
+            for(int z = 0; z < nBlockSide; ++z) {
 
                 blocks[{x, y, z}] = TypeOfBlock::GRASS;
 
@@ -21,13 +25,15 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos) : pos{_pos} {
         }
     }
 
-    va = std::unique_ptr<VertexArray>{ new VertexArray{} };
+    va = std::shared_ptr<VertexArray>{ new VertexArray{} };
+    std::cout <<" cacca"<<std::endl;
 
-    vb = std::unique_ptr<VertexBuffer>{ new VertexBuffer{} };
-    eb = std::unique_ptr<ElementBuffer>{ new ElementBuffer{&(Block::indeces[0]), 36} };
-    eb -> bind();
+    vb = std::shared_ptr<VertexBuffer>{ new VertexBuffer{} };
+
+    eb = std::shared_ptr<ElementBuffer>{ new ElementBuffer{nullptr, 0} };
+    //eb -> bind();
     
-    layout = std::unique_ptr<VertexBufferLayout> { new VertexBufferLayout{} };
+    layout = std::shared_ptr<VertexBufferLayout> { new VertexBufferLayout{} };
     layout -> push<float>(3);
 
     updateBuffers();
@@ -35,41 +41,59 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos) : pos{_pos} {
 
 void PieceOfWorld::updateBuffers() {
 
-    vb -> updateData(&(getVertecies()[0]), 8 * 3 * sizeof(float));
+    vb -> updateData(&(getVertecies()[0]), (blocks.size() * 8) * 3 * sizeof(float));
     va -> bindVb(*vb, *layout);
 
     // update also the idex buffer in the future (when I will render more than one cube)
-    eb -> bind();
-
+    eb -> updateData(&(getIndecies()[0]), blocks.size() * 36);
 }
 
 std::vector<float> PieceOfWorld::getVertecies() const {
     std::vector<float> data{};
 
-    for(int z = 0; z < nBlockHeight; ++z) {
+    for(auto itr = blocks.begin(); itr != blocks.end(); ++itr) {
+            
+        std::tuple<int, int, int> coordinates = itr -> first;
+        std::vector<float> vertecies = getVerteciesOfBlock(std::get<0>(coordinates), std::get<1>(coordinates), std::get<2>(coordinates));
 
-        for(int x = 0; x < nBlockSide; ++x) {
-
-            for(int y = 0; y < nBlockSide; ++y) {
-
-                std::vector<float> vertecies = getVertecies(x, y, z);
-
-                data.insert(data.end(), vertecies.begin(), vertecies.end());
-            }
-        }
+        data.insert(data.end(), vertecies.begin(), vertecies.end());
     }
-    return data;
 
-    //return {1,2};
+    //for(auto i : data)
+        //std::cout << i << " " <<std::endl;
+
+    return data;
 }
 
 std::vector<unsigned int> PieceOfWorld::getIndecies() const {
-    return {1, 2};
+    std::vector<unsigned int> data{};
+
+    int counter = 0;
+
+    while(counter < blocks.size()) {
+        std::vector<unsigned int> vertecies = getIndecesOfBlock(counter);
+
+        data.insert(data.end(), vertecies.begin(), vertecies.end());
+
+        counter++;
+    }
+
+    //for(auto i : data)
+        //std::cout << i << " " <<std::endl;
+
+    return data;
+}
+
+std::vector<unsigned int> PieceOfWorld::getIndecesOfBlock(int counter) const {
+    std::vector<unsigned int> data;
+    for(int i = 0; i < 36; ++i) 
+        data.push_back(ind[i] + counter * 8);
+    return data;
 }
 
 
 //std::vector<float> PieceOfWorld::getVertecies(float xCenter, float yCenter, float zCenter) const {
-std::vector<float> PieceOfWorld::getVertecies(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock) const {
+std::vector<float> PieceOfWorld::getVerteciesOfBlock(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock) const {
 
     float halfDim = (float)(Block::DIMBLOCK / 2);
     float xCenter = (float)(Block::DIMBLOCK * xBlock) + halfDim;
@@ -83,9 +107,9 @@ std::vector<float> PieceOfWorld::getVertecies(unsigned int xBlock, unsigned int 
 
             for(int x = -1; x <= 1; x += 2) {
 
-                vertecies.push_back(xCenter + (float)(halfDim * x));
+                vertecies.push_back(xoffset + xCenter + (float)(halfDim * x));
                 vertecies.push_back(yCenter + (float)(halfDim * y));
-                vertecies.push_back(zCenter + (float)(halfDim * z));
+                vertecies.push_back(zoffset + zCenter + (float)(halfDim * z));
 
             }
         }

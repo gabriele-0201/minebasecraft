@@ -23,7 +23,7 @@ class ElementBuffer {
         ElementBuffer(const ElementBuffer&) = delete;
         void operator=(const ElementBuffer&) = delete;
 
-        void newIndeces(unsigned int* data, unsigned int count);
+        void updateData(unsigned int* data, unsigned int count);
         unsigned int inline getCount() const { return count; };
 
         void bind() const;

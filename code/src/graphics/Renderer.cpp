@@ -44,18 +44,19 @@ void Renderer::draw() {
 
     shader -> setUniform4Matrix("projection", proj);
 
-    //std::vector<VertexArray &> vas = w.getAllVertexArrays();
-    //std::vector<ElementBuffer &> ebs = w.getAllElementBuffers();
+    std::vector<std::shared_ptr<VertexArray>> vas = w.getAllVertexArrays();
+    std::vector<std::shared_ptr<ElementBuffer>> ebs = w.getAllElementBuffers();
 
-    /*
     for(int i = 0; i < vas.size(); ++i) {
 
-        vas[i].bind();
-        ebs[i].bind();
+        vas[i] -> bind();
+        ebs[i] -> bind();
 
-        GLCall(glDrawElements(GL_TRIANGLES, ebs[i].getCount(), GL_UNSIGNED_INT, nullptr));
+        GLCall(glDrawElements(GL_TRIANGLES, ebs[i] -> getCount(), GL_UNSIGNED_INT, nullptr));
+
+        vas[i] -> unbind();
+        ebs[i] -> unbind();
     }
-    */
 
     //Texture texture("../minion.jpg");
     //texture.bind();
