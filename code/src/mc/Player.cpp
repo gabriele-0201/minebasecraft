@@ -9,6 +9,7 @@ Player::Player(GLFWwindow* window, glm::vec3 up) {
     cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
     cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
         
+    speed = 3.0f;
     deltaTime = 0.0f;
         
     lastx = 400.0f;
@@ -19,7 +20,7 @@ Player::Player(GLFWwindow* window, glm::vec3 up) {
 
 void Player::processKeyInput(GLFWwindow* window) {
 
-    float cameraSpeed = 2.5f * deltaTime; 
+    float cameraSpeed = speed * deltaTime; 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         cameraPos += cameraSpeed * cameraFront;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)

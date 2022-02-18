@@ -13,29 +13,13 @@ Renderer::Renderer(World& _w, Player& _p) :
     shader = std::unique_ptr<Shader>{ new Shader{"../code/program.shader"} };
 
 
-    proj = glm::perspective(glm::radians(p.fov), 640.0f/ 480.0f, 0.1f, 100.0f);
-
-
-    //std::vector<float> tmp = w.getAllVertecies()[0];
-    //vb = {&(tmp), 8 * 3 * sizeof(float)};
-
-    //layout.push<float>(3);
-    //va.bindVb(vb, layout);
-
-
+    proj = glm::perspective(glm::radians(p.fov), 1200.0f/ 900.0f, 0.1f, 100.0f);
 
 }
 
 Renderer::~Renderer() {}
 
 void Renderer::draw() {
-    
-
-    //VertexBuffer vb {&(w.getAllVertecies()[0]), 8 * 3 * sizeof(float)};
-    //VertexBuffer tmpVB {&(vertecies), 3 * 3 * sizeof(float)};
-    //ElementBuffer eb {tmpIndeces, 36};
-    //ElementBuffer tmpEB {indeces, 3};
-
     // DO SOME STUFF USING PIECE OF WORLDS
 
     shader -> bind();
@@ -64,9 +48,15 @@ void Renderer::draw() {
     // Send a integer uniform to the shader and it is the id we want to sample
     //shader.setUnifor1i("uTexture", 0);
 
+    // I will use an integer in the buffer data to say witch texture
 
-    //GLCall(glDrawElements(GL_TRIANGLES, eb.getCount(), GL_UNSIGNED_INT, nullptr));
-    //GLCall(glDrawElements(GL_TRIANGLES, eb -> getCount(), GL_UNSIGNED_INT, nullptr));
 }
 
+
+void Renderer::winSizeCb(float width, float height) {
+
+    proj = glm::perspective(glm::radians(p.fov), width / height, 0.1f, 100.0f);
+
+    glViewport(0, 0, width, height);
+}
 #endif

@@ -4,21 +4,34 @@
 #include "Renderer.h"
 
 Player* p = nullptr;
+Renderer* r = nullptr;
 
 void mouseMovCbGeneral(GLFWwindow* window, double xpos, double ypos) {
     ASSERT(p)
     p -> mouseMovCb(xpos, ypos);
 }
 
-int main(void) {
+void winSizeCbGeneral(GLFWwindow* window, int width, int height) {
+    ASSERT(r);
+    r -> winSizeCb(width, height);
 
+}
+
+void keyCb(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_H && action == GLFW_PRESS)
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    if (key == GLFW_KEY_V && action == GLFW_PRESS)
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+int main(void) {
 
     // Setting al the start stuff
 
     GLFWwindow* window;
 
-    int winHeight = 480;
-    int winWidth = 640 ;
+    int winHeight = 900;
+    int winWidth = 1200 ;
 
     /* Initialize the library */
     if (!glfwInit())
@@ -57,11 +70,16 @@ int main(void) {
     p = &player;
 
     Renderer renderer {world, player};
+    r = &renderer;
 
     // REMOVE in the future
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     
+    // SET UP the callbacks
     glfwSetCursorPosCallback(window, mouseMovCbGeneral);
+    glfwSetWindowSizeCallback(window, winSizeCbGeneral);
+    glfwSetKeyCallback(window, keyCb);
+
     //glfwSetScrollCallback(window, mouseMovCb);
 
     glEnable(GL_DEPTH_TEST);

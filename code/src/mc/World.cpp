@@ -7,14 +7,16 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win}{
 
     // For now only one piece 
     terrain[{0,0}] = PieceOfWorld({0,0});
-    terrain[{0,1}] = PieceOfWorld({0,1});
+    //terrain[{0,1}] = PieceOfWorld({0,1});
+
+
+    // HOW could I manage all the piece of the worlds?
 
 }
 
 std::vector<std::shared_ptr<VertexArray> > World::getAllVertexArrays() {
 
     std::vector<std::shared_ptr<VertexArray>> arrays{};
-    //buffers.push_back(std::vector<float> {});
 
     // someway reduce the chunks that will be calculed
     for(auto itr = terrain.begin(); itr != terrain.end(); ++itr) {
@@ -28,7 +30,6 @@ std::vector<std::shared_ptr<VertexArray> > World::getAllVertexArrays() {
 std::vector<std::shared_ptr<ElementBuffer> > World::getAllElementBuffers() {
 
     std::vector<std::shared_ptr<ElementBuffer>> arrays{};
-    //buffers.push_back(std::vector<float> {});
 
     // someway reduce the chunks that will be calculed
     for(auto itr = terrain.begin(); itr != terrain.end(); ++itr) {
@@ -41,6 +42,7 @@ std::vector<std::shared_ptr<ElementBuffer> > World::getAllElementBuffers() {
 
 
 
+/*
 std::vector<float> World::getAllVertecies() {
 
     std::vector<float> buffers{};
@@ -48,12 +50,9 @@ std::vector<float> World::getAllVertecies() {
 
     // someway reduce the chunks that will be calculed
     for(auto itr = terrain.begin(); itr != terrain.end(); ++itr) {
-
         std::vector<float> vertecies = (itr -> second).getVertecies();
-
         buffers.insert(buffers.end(), vertecies.begin(), vertecies.end());
     }
-
     return buffers;
 }
 
@@ -69,6 +68,7 @@ std::vector<std::vector<unsigned int>> World::getAllIndicies() {
 
     return buffers;
 }
+*/
 
 // This will update also the chunks that will be rendered each frame
 void World::updatePos() {

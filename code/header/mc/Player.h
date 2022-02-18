@@ -17,13 +17,14 @@ class Player {
         glm::vec3 cameraFront;
         glm::vec3 cameraUp;
         
-        float deltaTime = 0.0f;
+        float speed;
+        float deltaTime;
         
         // mouse stuff
-        float lastx = 400.0f;
-        float lasty = 300.0f;
-        float yaw = -90;
-        float pitch = 0;
+        float lastx;
+        float lasty;
+        float yaw;
+        float pitch;
         
         
     public: 

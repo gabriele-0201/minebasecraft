@@ -33,9 +33,9 @@ class World {
          * 1 - contains all the vertex to be used in the buffer
          * 2 - contains all the indeces that is used to draw the stuff int the same index buffer
          */
-        std::vector<float> getAllVertecies();
+        //std::vector<float> getAllVertecies();
         // TODO CHANGE
-        std::vector<std::vector<unsigned int>> getAllIndicies();
+        //std::vector<std::vector<unsigned int>> getAllIndicies();
 
         // This will update also the chunks that will be rendered each frame
         void updatePos();

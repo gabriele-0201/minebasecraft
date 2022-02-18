@@ -13,7 +13,7 @@
 #include "GLC.h"
 
 constexpr int nBlockSide = 32;
-constexpr int nBlockHeight = 1;
+constexpr int nBlockHeight = 100;
 constexpr unsigned int ind[] = {
     0, 1, 2,
     2, 3, 1,
@@ -34,6 +34,11 @@ constexpr unsigned int ind[] = {
     5, 7, 4
 };
 
+constexpr unsigned int indOfFaces[] = {
+    0, 1, 2,
+    2, 3, 1,
+};
+
 class PieceOfWorld {
 
     private:
@@ -41,6 +46,8 @@ class PieceOfWorld {
         std::pair<int, int> pos;
         float xoffset;
         float zoffset;
+
+        float halfDim;
         // Remember all the block, all the not specified block is
         std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
         //std::map<std::tuple<int, int, int>, int, HashTuples::hash3tuple> faces;
@@ -52,7 +59,11 @@ class PieceOfWorld {
         std::vector<unsigned int> indeces;
 
         std::vector<float> getVerteciesOfBlock(unsigned int, unsigned int, unsigned int) const;
+        std::vector<float> getVerteciesOfAFace(unsigned int, unsigned int, unsigned int, glm::vec3 dir);
+
         std::vector<unsigned int> getIndecesOfBlock(int counter) const;
+        std::vector<unsigned int> getIndecesOfAFace(int counter) const;
+
         std::shared_ptr<VertexArray> va;
         std::shared_ptr<VertexBuffer> vb;
         std::shared_ptr<VertexBufferLayout> layout;
@@ -66,8 +77,8 @@ class PieceOfWorld {
         PieceOfWorld();
         PieceOfWorld(std::pair<int, int>);
 
-        std::vector<float> getVertecies() const;
-        std::vector<unsigned int> getIndecies() const;
+        //std::vector<float> getVertecies() const;
+        //std::vector<unsigned int> getIndecies() const;
 
         std::pair<int, int> inline getPos() { return pos; };
 

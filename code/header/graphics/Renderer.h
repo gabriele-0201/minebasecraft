@@ -37,9 +37,12 @@ class Renderer {
         Renderer(World& w, Player& p);
         ~Renderer();
 
-        //void draw(const VertexArray& va, const ElementBuffer& ib, const Shader& shader) const;
-
         void draw();
+
+        /**
+         * Window update size
+         */
+        void winSizeCb(float width, float height);
 
 };
 
