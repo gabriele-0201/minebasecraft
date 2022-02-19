@@ -9,24 +9,25 @@
 class Texture {
     private:
 
-        // Keep track if the Object is created with a default constructor
-        bool defCostruct;
-
         unsigned int id;
         std::string filePath;
         unsigned char* localBuffer;
         int width, height, BPP;
 
     public:
-        Texture();
         Texture(const std::string& path);
         ~Texture();
+
+        Texture(const Texture&) = delete;
+        void operator=(const Texture&) = delete;
+
 
         void bind(unsigned int slot = 0) const;
         void unbind() const;
 
         inline int getWidth() const { return width; };
         inline int getHeight() const { return height; };
+        inline int getId() const { return id; }
 };
 
 #endif

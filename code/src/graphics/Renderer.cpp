@@ -11,7 +11,8 @@ Renderer::Renderer(World& _w, Player& _p) :
         {
 
     shader = std::unique_ptr<Shader>{ new Shader{"../code/program.shader"} };
-
+    texture = std::unique_ptr<Texture>{ new Texture{"../res/blocks.png"} };
+    texture -> bind();
 
     proj = glm::perspective(glm::radians(p.fov), 1200.0f/ 900.0f, 0.1f, 100.0f);
 
@@ -28,6 +29,8 @@ void Renderer::draw() {
 
     shader -> setUniform4Matrix("projection", proj);
 
+    shader -> setUniform1i("texId", texture -> getId());
+
     std::vector<std::shared_ptr<VertexArray>> vas = w.getAllVertexArrays();
     std::vector<std::shared_ptr<ElementBuffer>> ebs = w.getAllElementBuffers();
 
@@ -42,14 +45,10 @@ void Renderer::draw() {
         ebs[i] -> unbind();
     }
 
-    //Texture texture("../minion.jpg");
-    //texture.bind();
-
     // Send a integer uniform to the shader and it is the id we want to sample
     //shader.setUnifor1i("uTexture", 0);
 
     // I will use an integer in the buffer data to say witch texture
-
 }
 
 

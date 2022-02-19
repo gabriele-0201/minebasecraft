@@ -15,7 +15,7 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos) : pos{_pos} {
 
     halfDim = (float)(Block::DIMBLOCK / 2);
 
-    int hGrass = 1;
+    int hGrass = 5;
 
     for(int x = 0; x < nBlockSide; ++x) {
 
@@ -34,7 +34,7 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos) : pos{_pos} {
         }
     }
     
-    blocks[{0, 1, 0}] = TypeOfBlock::GRASS;
+    blocks[{0, 15, 0}] = TypeOfBlock::GRASS;
 
     va = std::shared_ptr<VertexArray>{ new VertexArray{} };
     vb = std::shared_ptr<VertexBuffer>{ new VertexBuffer{} };
@@ -42,6 +42,7 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos) : pos{_pos} {
     
     layout = std::shared_ptr<VertexBufferLayout> { new VertexBufferLayout{} };
     layout -> push<float>(3);
+    layout -> push<float>(2);
 
     updateBuffers();
 }
@@ -60,7 +61,7 @@ void PieceOfWorld::updateBuffers() {
         // work on vertecies
         std::tuple<int, int, int> coordinates = itr -> first;
         //std::cout << "blocks " <<std::endl;
-        std::cout << std::get<0>(coordinates) << " " << std::get<1>(coordinates) << " " << std::get<2>(coordinates) << " " << std::endl;
+        //std::cout << std::get<0>(coordinates) << " " << std::get<1>(coordinates) << " " << std::get<2>(coordinates) << " " << std::endl;
         //std::cout << " FINE" <<std::endl;
 
         //std::vector<float> blockCoords = getVerteciesOfBlock(std::get<0>(coordinates), std::get<1>(coordinates), std::get<2>(coordinates));
@@ -87,12 +88,19 @@ void PieceOfWorld::updateBuffers() {
 
                 // [] operator is not const
                 auto checkValue = blocks.find({std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, std::get<2>(coordinates) + dir.z});
-                if(checkValue == blocks.end() || checkValue -> second != TypeOfBlock::SKY)
+                // THIS solution is only for now, because I'm rendering all the freaking faces beteween chunks
+                // RENDER also the side of the the face to other chunks
+                if(checkValue != blocks.end() && checkValue -> second != TypeOfBlock::SKY)
                     continue;
 
+                std::cout << std::get<0>(coordinates) << " " << std::get<1>(coordinates) << " " << std::get<2>(coordinates) << " " << std::endl;
                 //std::cout << dir.x << " " << dir.y << " " << dir.z << " " << std::endl;
 
-                std::vector<float> blockCoords = getVerteciesOfAFace(std::get<0>(coordinates), std::get<1>(coordinates), std::get<2>(coordinates), dir);
+                std::vector<float> blockCoords = getVerteciesOfAFace(std::get<0>(coordinates), std::get<1>(coordinates), std::get<2>(coordinates), dir, checkValue -> second);
+                
+                // std::vector<float> test {0.0f, 0.0f, 0.0f};
+                // if(blockCoords == test)
+                //     std::cout << counter <<std::endl;
                 
                 vertecies.insert(vertecies.end(), blockCoords.begin(), blockCoords.end());
 
@@ -103,32 +111,26 @@ void PieceOfWorld::updateBuffers() {
 
             }
         }
-
-
-        // vertecies.insert(vertecies.end(), blockCoords.begin(), blockCoords.end());
-
-        // work on indeces
-        //std::vector<unsigned int> blockInds = getIndecesOfBlock(counter);
-
-        //indeces.insert(indeces.end(), blockInds.begin(), blockInds.end());
-
-        //counter++;
     }
+
+    std::cout << counter << std::endl;
 
     // Degub
     for(auto i : vertecies)
        std::cout << i << " " <<std::endl;
+    std::cout << " Fine vertici " <<std::endl;
     for(auto i : indeces)
        std::cout << i << " " <<std::endl;
 
-    vb -> updateData(&(vertecies[0]), (counter * 8) * 3 * sizeof(float));
+    vb -> updateData(&(vertecies[0]), (counter * 4) * 3 * sizeof(float));
     va -> bindVb(*vb, *layout);
 
     // update also the idex buffer in the future (when I will render more than one cube)
-    eb -> updateData(&(indeces[0]), counter * 36);
+    // SIX indeces for each face
+    eb -> updateData(&(indeces[0]), counter * 6);
 }
 
-std::vector<float> PieceOfWorld::getVerteciesOfAFace(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, glm::vec3 dir) {
+std::vector<float> PieceOfWorld::getVerteciesOfAFace(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, glm::vec3 dir, TypeOfBlock type) {
 
     //std::cout << "half dim " << halfDim <<std::endl;
 
@@ -146,11 +148,14 @@ std::vector<float> PieceOfWorld::getVerteciesOfAFace(unsigned int xBlock, unsign
 
         for(int j = -1; j <= 1; j += 2) {
 
+
             if(dir.x != 0) {
 
                 vertecies.push_back(xoffset + xCenter + (float)(halfDim * dir.x));
                 vertecies.push_back(yCenter + (float)(halfDim * i));
                 vertecies.push_back(zoffset + zCenter + (float)(halfDim * j));
+
+                // TODO understand how get the corner from i and j
 
             } else if (dir.y != 0) {
 
@@ -165,6 +170,10 @@ std::vector<float> PieceOfWorld::getVerteciesOfAFace(unsigned int xBlock, unsign
                 vertecies.push_back(zoffset + zCenter + (float)(halfDim * dir.z));
 
             }
+
+            std::pair<float, float> texCoord = Block::getTexCoord(i, j);
+            vertecies.push_back(texCoord.first);
+            vertecies.push_back(texCoord.second);
 
         }
     }

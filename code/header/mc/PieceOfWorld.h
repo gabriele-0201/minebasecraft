@@ -12,8 +12,8 @@
 #include "ElementBuffer.h"
 #include "GLC.h"
 
-constexpr int nBlockSide = 32;
-constexpr int nBlockHeight = 100;
+constexpr int nBlockSide = 16;
+constexpr int nBlockHeight = 256;
 constexpr unsigned int ind[] = {
     0, 1, 2,
     2, 3, 1,
@@ -59,7 +59,7 @@ class PieceOfWorld {
         std::vector<unsigned int> indeces;
 
         std::vector<float> getVerteciesOfBlock(unsigned int, unsigned int, unsigned int) const;
-        std::vector<float> getVerteciesOfAFace(unsigned int, unsigned int, unsigned int, glm::vec3 dir);
+        std::vector<float> getVerteciesOfAFace(unsigned int, unsigned int, unsigned int, glm::vec3 dir, TypeOfBlock type);
 
         std::vector<unsigned int> getIndecesOfBlock(int counter) const;
         std::vector<unsigned int> getIndecesOfAFace(int counter) const;

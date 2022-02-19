@@ -7,6 +7,7 @@
 
 #include "VertexArray.h"
 #include "Shader.h"
+#include "Texture.h"
 #include "World.h"
 #include "Player.h"
 
@@ -25,6 +26,7 @@ class Renderer {
         //std::unique_ptr<VertexBufferLayout> layout;
         //std::unique_ptr<ElementBuffer> eb;
         std::unique_ptr<Shader> shader;
+        std::unique_ptr<Texture> texture;
 
         //VertexArray va;
         //VertexBuffer vb;
