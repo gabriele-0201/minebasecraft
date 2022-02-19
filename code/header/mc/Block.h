@@ -16,7 +16,7 @@ namespace Block {
         switch (type) {
             case TypeOfBlock::GRASS:
                 
-                pos.first = 1;
+                pos.first = 16;
 
                 if(dir.y == 1) 
                     pos.second = 1;
@@ -27,11 +27,11 @@ namespace Block {
 
                 break;
             case TypeOfBlock::SAND:
-                pos.first = 2;
+                pos.first = 15;
                 pos.second = 1;
                 break;
             case TypeOfBlock::STONE:
-                pos.first = 1;
+                pos.first = 16;
                 pos.second = 4;
                 break;
             default:
