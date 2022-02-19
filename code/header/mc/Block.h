@@ -20,7 +20,7 @@ namespace Block {
 
                 if(dir.y == 1) 
                     pos.second = 1;
-                if(dir.y == -1) 
+                else if(dir.y == -1) 
                     pos.second = 3;
                 else 
                     pos.second = 2;
@@ -45,7 +45,7 @@ namespace Block {
 
         std::pair<int, int> pos = getRowColumn(type, dir);
         std::pair<float, float> tex;
-        tex.first = ((float)(pos.first - 1)) * DIMTEXBLOCK;
+        tex.first = ((float)(pos.first)) * DIMTEXBLOCK;
         tex.second = ((float)(pos.second - 1)) * DIMTEXBLOCK;
         return tex;
 
@@ -57,7 +57,7 @@ namespace Block {
         std::pair<int, int> pos = getRowColumn(type, dir);
         std::pair<float, float> tex;
         tex.first = ((float)(pos.first)) * DIMTEXBLOCK;
-        tex.second = ((float)(pos.second - 1)) * DIMTEXBLOCK;
+        tex.second = ((float)(pos.second)) * DIMTEXBLOCK;
         return tex;
 
     }
@@ -67,8 +67,8 @@ namespace Block {
 
         std::pair<int, int> pos = getRowColumn(type, dir);
         std::pair<float, float> tex;
-        tex.first = ((float)(pos.first - 1)) * DIMTEXBLOCK;
-        tex.second = ((float)(pos.second)) * DIMTEXBLOCK;
+        tex.first = ((float)(pos.first)) * DIMTEXBLOCK;
+        tex.second = ((float)(pos.second - 1)) * DIMTEXBLOCK;
         return tex;
 
     }
@@ -78,7 +78,7 @@ namespace Block {
 
         std::pair<int, int> pos = getRowColumn(type, dir);
         std::pair<float, float> tex;
-        tex.first = ((float)(pos.first)) * DIMTEXBLOCK;
+        tex.first = ((float)(pos.first - 1)) * DIMTEXBLOCK;
         tex.second = ((float)(pos.second)) * DIMTEXBLOCK;
         return tex;
 

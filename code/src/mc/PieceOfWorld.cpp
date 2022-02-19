@@ -175,9 +175,12 @@ std::vector<float> PieceOfWorld::getVerteciesOfAFace(unsigned int xBlock, unsign
 
             // TODO understand how get the corner from i and j
             std::pair<float, float> texCoord = Block::getTexCoord(i, j, type, dir);
-            std::cout << "TEX COORD " << texCoord.first << " " << texCoord.second << std::endl;
-            vertecies.push_back(texCoord.first);
+            std::cout << "TEX COORD for " << i << " - " <<j <<" coord: " << texCoord.first << " " << texCoord.second << std::endl;
+            //vertecies.push_back(texCoord.first);
+            //vertecies.push_back(texCoord.second);
+
             vertecies.push_back(texCoord.second);
+            vertecies.push_back(texCoord.first);
 
         }
     }
