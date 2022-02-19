@@ -15,7 +15,8 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos) : pos{_pos} {
 
     halfDim = (float)(Block::DIMBLOCK / 2);
 
-    int hGrass = 5;
+    // int hGrass = 5;
+    int hGrass = 1;
 
     for(int x = 0; x < nBlockSide; ++x) {
 
@@ -34,7 +35,7 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos) : pos{_pos} {
         }
     }
     
-    blocks[{0, 15, 0}] = TypeOfBlock::GRASS;
+    //blocks[{0, 15, 0}] = TypeOfBlock::GRASS;
 
     va = std::shared_ptr<VertexArray>{ new VertexArray{} };
     vb = std::shared_ptr<VertexBuffer>{ new VertexBuffer{} };
@@ -96,7 +97,7 @@ void PieceOfWorld::updateBuffers() {
                 std::cout << std::get<0>(coordinates) << " " << std::get<1>(coordinates) << " " << std::get<2>(coordinates) << " " << std::endl;
                 //std::cout << dir.x << " " << dir.y << " " << dir.z << " " << std::endl;
 
-                std::vector<float> blockCoords = getVerteciesOfAFace(std::get<0>(coordinates), std::get<1>(coordinates), std::get<2>(coordinates), dir, checkValue -> second);
+                std::vector<float> blockCoords = getVerteciesOfAFace(std::get<0>(coordinates), std::get<1>(coordinates), std::get<2>(coordinates), dir, itr -> second);
                 
                 // std::vector<float> test {0.0f, 0.0f, 0.0f};
                 // if(blockCoords == test)
@@ -141,8 +142,10 @@ std::vector<float> PieceOfWorld::getVerteciesOfAFace(unsigned int xBlock, unsign
     std::vector<float> vertecies{};
 
     //std::cout << xBlock << " " << yBlock << " " << zBlock << " " << std::endl;
-    // std::cout << "centro oo" << std::endl;
-    // std::cout << xCenter << " " << yCenter << " " << zCenter << " " << std::endl;
+    std::cout << "centro oo" << std::endl;
+    std::cout << xCenter << " " << yCenter << " " << zCenter << " " << std::endl;
+    std::cout << "dir " <<std::endl;
+    std::cout << dir.x << " " << dir.y << " " << dir.z << " " << std::endl;
 
     for(int i = -1; i <= 1; i += 2) {
 
@@ -155,13 +158,12 @@ std::vector<float> PieceOfWorld::getVerteciesOfAFace(unsigned int xBlock, unsign
                 vertecies.push_back(yCenter + (float)(halfDim * i));
                 vertecies.push_back(zoffset + zCenter + (float)(halfDim * j));
 
-                // TODO understand how get the corner from i and j
-
             } else if (dir.y != 0) {
 
                 vertecies.push_back(xoffset + xCenter + (float)(halfDim * i));
                 vertecies.push_back(yCenter + (float)(halfDim * dir.y));
-                vertecies.push_back(zoffset + zCenter + (float)(halfDim * j));
+                // INVERT THAT FOR NOW, see that will work
+                vertecies.push_back(zoffset + zCenter + (float)(halfDim * (j * (-1))));
 
             } else if (dir.z != 0) {
 
@@ -171,7 +173,9 @@ std::vector<float> PieceOfWorld::getVerteciesOfAFace(unsigned int xBlock, unsign
 
             }
 
-            std::pair<float, float> texCoord = Block::getTexCoord(i, j);
+            // TODO understand how get the corner from i and j
+            std::pair<float, float> texCoord = Block::getTexCoord(i, j, type, dir);
+            std::cout << "TEX COORD " << texCoord.first << " " << texCoord.second << std::endl;
             vertecies.push_back(texCoord.first);
             vertecies.push_back(texCoord.second);
 

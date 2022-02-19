@@ -12,8 +12,8 @@
 #include "ElementBuffer.h"
 #include "GLC.h"
 
-constexpr int nBlockSide = 16;
-constexpr int nBlockHeight = 256;
+constexpr int nBlockSide = 1;
+constexpr int nBlockHeight = 1;
 constexpr unsigned int ind[] = {
     0, 1, 2,
     2, 3, 1,

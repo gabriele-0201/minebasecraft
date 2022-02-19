@@ -4,7 +4,8 @@
 enum class TypeOfBlock {
     GRASS,
     SKY,
-    SAND
+    SAND,
+    STONE
 };
 
 #endif
