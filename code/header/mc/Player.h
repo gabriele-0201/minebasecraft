@@ -1,11 +1,14 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "World.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <GLFW/glfw3.h>
+#include "Enums.h"
+#include "Block.h"
 
 class Player {
 
@@ -25,6 +28,10 @@ class Player {
         float lasty;
         float yaw;
         float pitch;
+
+        World& w;
+        float intervalOfCheck;
+        TypeOfBlock selectedBlock;
         
         
     public: 
@@ -34,11 +41,13 @@ class Player {
         /**
          * Default up vector is the y normalized
          */
-        Player(GLFWwindow* window, glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f));
+        Player(GLFWwindow* window, World& w, glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f));
 
         glm::mat4 inline getViewMatrix() const { return viewMatrix; };
 
         void processKeyInput(GLFWwindow* window);
+        void addBlock();
+        void breakBlock();
 
         /**
          * Mouse movement callback

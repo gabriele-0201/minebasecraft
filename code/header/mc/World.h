@@ -40,10 +40,17 @@ class World {
         // This will update also the chunks that will be rendered each frame
         void updatePos();
 
-        void breakBlock();
+        /**
+         * Check if in a determinate position there is a block or not
+         */
+        bool isBlock(glm::vec3 pos);
+
+        /**
+         * Remove the block in the specified position
+         */
+        void breakBlock(glm::vec3 pos);
 
         void addBlock(TypeOfBlock);
-
 
         std::vector<std::shared_ptr<VertexArray> > getAllVertexArrays();
         std::vector<std::shared_ptr<ElementBuffer> > getAllElementBuffers();

@@ -7,8 +7,10 @@
 
 namespace Block {
     constexpr float DIMBLOCK = 1.0f;
-    constexpr float DIMTEXBLOCK = 0.0624f;
+    constexpr float DIMTEXBLOCK = 0.0625f;
 
+    // FIRST ROW
+    // SECOND COLUMN
     static std::pair<int, int> getRowColumn(TypeOfBlock type, glm::vec3 dir) {
         
         std::pair<int, int> pos;
@@ -26,6 +28,12 @@ namespace Block {
                     pos.second = 2;
 
                 break;
+
+            case TypeOfBlock::SOIL:
+                pos.first = 16;
+                pos.second = 3;
+                break;
+
             case TypeOfBlock::SAND:
                 pos.first = 15;
                 pos.second = 1;
@@ -45,8 +53,8 @@ namespace Block {
 
         std::pair<int, int> pos = getRowColumn(type, dir);
         std::pair<float, float> tex;
-        tex.first = ((float)(pos.first)) * DIMTEXBLOCK;
-        tex.second = ((float)(pos.second - 1)) * DIMTEXBLOCK;
+        tex.first = ((float)(pos.second - 1)) * DIMTEXBLOCK;
+        tex.second = ((float)(pos.first)) * DIMTEXBLOCK;
         return tex;
 
     }
@@ -56,8 +64,8 @@ namespace Block {
 
         std::pair<int, int> pos = getRowColumn(type, dir);
         std::pair<float, float> tex;
-        tex.first = ((float)(pos.first)) * DIMTEXBLOCK;
-        tex.second = ((float)(pos.second)) * DIMTEXBLOCK;
+        tex.first = ((float)(pos.second)) * DIMTEXBLOCK;
+        tex.second = ((float)(pos.first)) * DIMTEXBLOCK;
         return tex;
 
     }
@@ -67,8 +75,8 @@ namespace Block {
 
         std::pair<int, int> pos = getRowColumn(type, dir);
         std::pair<float, float> tex;
-        tex.first = ((float)(pos.first)) * DIMTEXBLOCK;
-        tex.second = ((float)(pos.second - 1)) * DIMTEXBLOCK;
+        tex.first = ((float)(pos.second - 1)) * DIMTEXBLOCK;
+        tex.second = ((float)(pos.first - 1)) * DIMTEXBLOCK;
         return tex;
 
     }
@@ -78,8 +86,8 @@ namespace Block {
 
         std::pair<int, int> pos = getRowColumn(type, dir);
         std::pair<float, float> tex;
-        tex.first = ((float)(pos.first - 1)) * DIMTEXBLOCK;
-        tex.second = ((float)(pos.second)) * DIMTEXBLOCK;
+        tex.first = ((float)(pos.second)) * DIMTEXBLOCK;
+        tex.second = ((float)(pos.first - 1)) * DIMTEXBLOCK;
         return tex;
 
     }

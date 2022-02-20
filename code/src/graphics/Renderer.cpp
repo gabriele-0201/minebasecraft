@@ -14,7 +14,11 @@ Renderer::Renderer(World& _w, Player& _p) :
     texture = std::unique_ptr<Texture>{ new Texture{"../res/blocks.png"} };
     texture -> bind();
 
+    shader -> bind();
+    shader -> setUniform1i("texId", 0);
+
     proj = glm::perspective(glm::radians(p.fov), 1200.0f/ 900.0f, 0.1f, 100.0f);
+    shader -> setUniform4Matrix("projection", proj);
 
 }
 
@@ -23,13 +27,14 @@ Renderer::~Renderer() {}
 void Renderer::draw() {
     // DO SOME STUFF USING PIECE OF WORLDS
 
-    shader -> bind();
+    // MAYBE usefull do it every time
+    //shader -> bind();
+    //texture -> bind();
 
     shader -> setUniform4Matrix("view", p.getViewMatrix());
 
-    shader -> setUniform4Matrix("projection", proj);
-
-    shader -> setUniform1i("texId", texture -> getId());
+    // this could be done only when update the proj matrix
+    // shader -> setUniform4Matrix("projection", proj);
 
     std::vector<std::shared_ptr<VertexArray>> vas = w.getAllVertexArrays();
     std::vector<std::shared_ptr<ElementBuffer>> ebs = w.getAllElementBuffers();
@@ -57,5 +62,6 @@ void Renderer::winSizeCb(float width, float height) {
     proj = glm::perspective(glm::radians(p.fov), width / height, 0.1f, 100.0f);
 
     glViewport(0, 0, width, height);
+    shader -> setUniform4Matrix("projection", proj);
 }
 #endif

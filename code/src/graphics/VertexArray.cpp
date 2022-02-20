@@ -19,7 +19,7 @@ VertexArray::~VertexArray(){
 /**
  * Maybe usefull but when some change but I do not want to recreate the entire vertex array
  */
-void VertexArray::bindVb(VertexBuffer& vb, VertexBufferLayout& layout){
+void VertexArray::bindVb(const VertexBuffer& vb, const VertexBufferLayout& layout){
     bind();
     vb.bind();
 

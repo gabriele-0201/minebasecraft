@@ -12,8 +12,8 @@
 #include "ElementBuffer.h"
 #include "GLC.h"
 
-constexpr int nBlockSide = 1;
-constexpr int nBlockHeight = 1;
+constexpr int nBlockSide = 16;
+constexpr int nBlockHeight = 256;
 constexpr unsigned int ind[] = {
     0, 1, 2,
     2, 3, 1,
@@ -84,6 +84,18 @@ class PieceOfWorld {
 
         inline std::shared_ptr<VertexArray> getVertexArray() { return va; };
         inline std::shared_ptr<ElementBuffer> getElementBuffer() { return eb; };
+
+        /**
+         * Check if in a determinate position there is a block or not
+         */
+        bool isBlock(unsigned int x, unsigned int y, unsigned int z);
+
+        /**
+         * Remove the block in the specified position
+         */
+        void breakBlock(unsigned int x, unsigned int y, unsigned int z);
+
+        void addBlock(TypeOfBlock);
 
 };
 

@@ -11,6 +11,13 @@ void mouseMovCbGeneral(GLFWwindow* window, double xpos, double ypos) {
     p -> mouseMovCb(xpos, ypos);
 }
 
+void mouseButtonCbGeneral(GLFWwindow* window, int button, int action, int mods) {
+    //if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+        //p -> addBlock();
+    /*else*/ if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+        p -> breakBlock();
+}
+
 void winSizeCbGeneral(GLFWwindow* window, int width, int height) {
     ASSERT(r);
     r -> winSizeCb(width, height);
@@ -66,17 +73,18 @@ int main(void) {
     // THOSE maybe will go in the RENDERER
 
     World world {window, 1};
-    Player player {window};
+    Player player {window, world};
     p = &player;
 
     Renderer renderer {world, player};
     r = &renderer;
 
     // REMOVE in the future
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     
     // SET UP the callbacks
     glfwSetCursorPosCallback(window, mouseMovCbGeneral);
+    glfwSetMouseButtonCallback(window, mouseButtonCbGeneral);
     glfwSetWindowSizeCallback(window, winSizeCbGeneral);
     glfwSetKeyCallback(window, keyCb);
 

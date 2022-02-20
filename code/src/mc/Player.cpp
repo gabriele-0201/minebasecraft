@@ -3,7 +3,7 @@
 
 #include "Player.h"
 
-Player::Player(GLFWwindow* window, glm::vec3 up) {
+Player::Player(GLFWwindow* window, World& _w, glm::vec3 up) : w{_w}{
 
     cameraPos = glm::vec3(0.0f, 10.0f, 0.0f);
     cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
@@ -16,6 +16,9 @@ Player::Player(GLFWwindow* window, glm::vec3 up) {
     lasty = 300.0f;
     yaw = 0;
     pitch = 0;
+
+    intervalOfCheck = 0.05f;
+    selectedBlock = TypeOfBlock::SAND;
 }
 
 void Player::processKeyInput(GLFWwindow* window) {
@@ -69,6 +72,23 @@ void Player::setDeltaTime (float t) {
 
 float Player::getDeltaTime() {
     return deltaTime;
+}
+
+void Player::breakBlock() {
+
+    float multiplayer = intervalOfCheck;
+    float maxDistance = 6 * Block::DIMBLOCK;
+    while(glm::length((cameraFront * multiplayer)) <= maxDistance) {
+        
+        glm::vec3 blockPos = cameraPos + (cameraFront * multiplayer);
+        if(w.isBlock(blockPos)) {
+            w.breakBlock(blockPos);
+            break;
+        }
+
+        multiplayer += intervalOfCheck;
+
+    }
 }
 
 /*

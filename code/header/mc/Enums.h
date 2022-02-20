@@ -3,6 +3,7 @@
 
 enum class TypeOfBlock {
     GRASS,
+    SOIL,
     SKY,
     SAND,
     STONE

@@ -16,6 +16,8 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos) : pos{_pos} {
     halfDim = (float)(Block::DIMBLOCK / 2);
 
     // int hGrass = 5;
+    int hStone = 2;
+    int hSoil = 2;
     int hGrass = 1;
 
     for(int x = 0; x < nBlockSide; ++x) {
@@ -23,15 +25,20 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos) : pos{_pos} {
         for(int z = 0; z < nBlockSide; ++z) {
 
             // in the future hGrass is the result of a noise function
-            for(int y = 0; y < hGrass; ++y) {
+            for(int y = 0; y < hStone; ++y) {
+                blocks[{x, y, z}] = TypeOfBlock::STONE;
+            }
+            for(int y = hStone; y < (hSoil + hStone); ++y) {
+                blocks[{x, y, z}] = TypeOfBlock::SOIL;
+            }
+            for(int y = hSoil + hStone; y <  (hSoil + hStone + hGrass); ++y) {
                 blocks[{x, y, z}] = TypeOfBlock::GRASS;
-                //std::cout <<x << " : " << y << " : " <<z <<std::endl;
             }
 
-            for(int y = hGrass; y < nBlockHeight; ++y) {
-                blocks[{x, y, z}] = TypeOfBlock::SKY;
+            //for(int y = hGrass; y < nBlockHeight; ++y) {
+                //blocks[{x, y, z}] = TypeOfBlock::SKY;
                 //std::cout <<x << " : " << y << " : " <<z <<std::endl;
-            }
+            //}
         }
     }
     
@@ -87,6 +94,7 @@ void PieceOfWorld::updateBuffers() {
                 }
 
 
+                // TEST not assign SKY type, if is not in the map so it is sky
                 // [] operator is not const
                 auto checkValue = blocks.find({std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, std::get<2>(coordinates) + dir.z});
                 // THIS solution is only for now, because I'm rendering all the freaking faces beteween chunks
@@ -94,7 +102,7 @@ void PieceOfWorld::updateBuffers() {
                 if(checkValue != blocks.end() && checkValue -> second != TypeOfBlock::SKY)
                     continue;
 
-                std::cout << std::get<0>(coordinates) << " " << std::get<1>(coordinates) << " " << std::get<2>(coordinates) << " " << std::endl;
+                //std::cout << std::get<0>(coordinates) << " " << std::get<1>(coordinates) << " " << std::get<2>(coordinates) << " " << std::endl;
                 //std::cout << dir.x << " " << dir.y << " " << dir.z << " " << std::endl;
 
                 std::vector<float> blockCoords = getVerteciesOfAFace(std::get<0>(coordinates), std::get<1>(coordinates), std::get<2>(coordinates), dir, itr -> second);
@@ -114,16 +122,16 @@ void PieceOfWorld::updateBuffers() {
         }
     }
 
-    std::cout << counter << std::endl;
+    //std::cout << counter << std::endl;
 
     // Degub
-    for(auto i : vertecies)
-       std::cout << i << " " <<std::endl;
-    std::cout << " Fine vertici " <<std::endl;
-    for(auto i : indeces)
-       std::cout << i << " " <<std::endl;
+    // for(auto i : vertecies)
+    //    std::cout << i << " " <<std::endl;
+    // std::cout << " Fine vertici " <<std::endl;
+    // for(auto i : indeces)
+    //    std::cout << i << " " <<std::endl;
 
-    vb -> updateData(&(vertecies[0]), (counter * 4) * 3 * sizeof(float));
+    vb -> updateData(&(vertecies[0]), (counter * 4) * 5 * sizeof(float));
     va -> bindVb(*vb, *layout);
 
     // update also the idex buffer in the future (when I will render more than one cube)
@@ -142,11 +150,12 @@ std::vector<float> PieceOfWorld::getVerteciesOfAFace(unsigned int xBlock, unsign
     std::vector<float> vertecies{};
 
     //std::cout << xBlock << " " << yBlock << " " << zBlock << " " << std::endl;
-    std::cout << "centro oo" << std::endl;
-    std::cout << xCenter << " " << yCenter << " " << zCenter << " " << std::endl;
-    std::cout << "dir " <<std::endl;
-    std::cout << dir.x << " " << dir.y << " " << dir.z << " " << std::endl;
+    // std::cout << "centro oo" << std::endl;
+    // std::cout << xCenter << " " << yCenter << " " << zCenter << " " << std::endl;
+    // std::cout << "dir " <<std::endl;
+    // std::cout << dir.x << " " << dir.y << " " << dir.z << " " << std::endl;
 
+    // Create the vertecies fot the faces and add also the texCoord in funtion to the vertecies we are calculating
     for(int i = -1; i <= 1; i += 2) {
 
         for(int j = -1; j <= 1; j += 2) {
@@ -155,8 +164,10 @@ std::vector<float> PieceOfWorld::getVerteciesOfAFace(unsigned int xBlock, unsign
             if(dir.x != 0) {
 
                 vertecies.push_back(xoffset + xCenter + (float)(halfDim * dir.x));
-                vertecies.push_back(yCenter + (float)(halfDim * i));
-                vertecies.push_back(zoffset + zCenter + (float)(halfDim * j));
+                //vertecies.push_back(yCenter + (float)(halfDim * i));
+                //vertecies.push_back(zoffset + zCenter + (float)(halfDim * j));
+                vertecies.push_back(yCenter + (float)(halfDim * j));
+                vertecies.push_back(zoffset + zCenter + (float)(halfDim * i));
 
             } else if (dir.y != 0) {
 
@@ -175,12 +186,9 @@ std::vector<float> PieceOfWorld::getVerteciesOfAFace(unsigned int xBlock, unsign
 
             // TODO understand how get the corner from i and j
             std::pair<float, float> texCoord = Block::getTexCoord(i, j, type, dir);
-            std::cout << "TEX COORD for " << i << " - " <<j <<" coord: " << texCoord.first << " " << texCoord.second << std::endl;
-            //vertecies.push_back(texCoord.first);
-            //vertecies.push_back(texCoord.second);
-
-            vertecies.push_back(texCoord.second);
+            // std::cout << "TEX COORD for " << i << " - " <<j <<" coord: " << texCoord.first << " " << texCoord.second << std::endl;
             vertecies.push_back(texCoord.first);
+            vertecies.push_back(texCoord.second);
 
         }
     }
@@ -268,10 +276,21 @@ std::vector<float> PieceOfWorld::getVerteciesOfBlock(unsigned int xBlock, unsign
     return vertecies;
 }
 
+bool PieceOfWorld::isBlock(unsigned int x, unsigned int y, unsigned int z) {
+    return blocks.find({x, y, z}) != blocks.end();
+}
+
+void PieceOfWorld::breakBlock(unsigned int x, unsigned int y, unsigned int z) {
+    std::cout << "Blocco da rimuovere: " << x << " " << y << " " << z << std::endl;
+    blocks.erase({x, y, z});
+    updateBuffers();
+}
+
 /**
  * Starting point
  * 0 0 0
  * 
+ * Vertecies for a cube:
  * -1  1 -1 - 1
  *  1  1 -1 - 2
  * -1  1  1 - 3
