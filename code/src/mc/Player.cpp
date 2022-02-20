@@ -87,6 +87,32 @@ void Player::breakBlock() {
         }
 
         multiplayer += intervalOfCheck;
+    }
+}
+
+void Player::addBlock() {
+
+    // KEEP track of the previous block and than calculate the dir (difference between the two blocks, the previuous and the final)
+
+    float multiplayer = intervalOfCheck;
+    float maxDistance = 6 * Block::DIMBLOCK;
+    while(glm::length((cameraFront * multiplayer)) <= maxDistance) {
+        
+        glm::vec3 blockPos = cameraPos + (cameraFront * multiplayer);
+        // calculate this value and send to the funciont, more readebly
+        int sizeSide = nBlockSide * Block::DIMBLOCK;
+        int xWorld = floor(pos.x / sizeSide);
+        int zWorld = floor(pos.z / sizeSide);
+        int xPieceOfWorld = (int)floor(pos.x) % nBlockSide;
+        int zPieceOfWorld = (int)floor(pos.z) % sizeSide;
+        int yPieceOfWorld = (int)floor(pos.y) ;
+
+        if(w.isBlock(blockPos)) {
+            w.breakBlock(blockPos);
+            break;
+        }
+
+        multiplayer += intervalOfCheck;
 
     }
 }

@@ -281,7 +281,7 @@ bool PieceOfWorld::isBlock(unsigned int x, unsigned int y, unsigned int z) {
 }
 
 void PieceOfWorld::breakBlock(unsigned int x, unsigned int y, unsigned int z) {
-    std::cout << "Blocco da rimuovere: " << x << " " << y << " " << z << std::endl;
+    //std::cout << "Blocco da rimuovere: " << x << " " << y << " " << z << std::endl;
     blocks.erase({x, y, z});
     updateBuffers();
 }
