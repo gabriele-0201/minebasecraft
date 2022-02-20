@@ -10,7 +10,6 @@ VertexArray::VertexArray() {
 
 
 VertexArray::~VertexArray(){
-    std::cout << "VIene chiamato il coso: " <<std::endl;
     GLCall(glDeleteVertexArrays(1, &id));
 }
 

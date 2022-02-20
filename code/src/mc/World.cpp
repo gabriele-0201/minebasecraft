@@ -16,13 +16,13 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win}{
     //     }
     // }
 
+    currentPos = {0,0};
+
     std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(0, 0);
     for(auto n: nears) {
+        //std::cout << n.first << " " << n.second << std::endl;
         terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second});
     }
-
-
-
 
     // HOW could I manage all the piece of the worlds?
 
@@ -30,7 +30,7 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win}{
 
 std::vector<std::pair<int, int>> World::getNearPieceOfWorld(int x, int z) {
 
-    int renderingPieces = 1;
+    int renderingPieces = 10;
     std::vector<std::pair<int, int>> nears {};
 
     for(int i = x - renderingPieces; i <= x + renderingPieces; ++i) {
@@ -48,9 +48,11 @@ std::vector<std::shared_ptr<VertexArray> > World::getAllVertexArrays() {
 
     // someway reduce the chunks that will be calculed
 
+    //std::cout <<" RENDERING " <<std::endl;
     std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(currentPos.first, currentPos.second);
     for(auto n: nears) {
 
+        //std::cout << n.first << " " << n.second << std::endl;
 
         arrays.push_back(terrain[{n.first, n.second}].getVertexArray());
 

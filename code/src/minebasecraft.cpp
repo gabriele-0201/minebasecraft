@@ -107,7 +107,7 @@ int main(void) {
         lastFrame = currentTime;
 
         /* Render here */
-        GLCall(glClearColor(0.0f, 0.2f, 0.2f, 1.0f));
+        GLCall(glClearColor(0.68f, 0.83f, 0.99f, 1.0f));
         GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
         player.processKeyInput(window);

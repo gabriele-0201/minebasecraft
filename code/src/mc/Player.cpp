@@ -9,7 +9,7 @@ Player::Player(GLFWwindow* window, World& _w, glm::vec3 up) : w{_w}{
     cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
     cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
         
-    speed = 3.0f;
+    speed = 10.0f;
     deltaTime = 0.0f;
         
     lastx = 400.0f;
@@ -38,7 +38,8 @@ void Player::processKeyInput(GLFWwindow* window) {
     viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
     // update position in the world
-    w.updatePos(cameraPos.x, cameraPos.y);
+    std::pair<glm::vec2, glm::vec3> position = getBlockPos(cameraPos);
+    w.updatePos(position.first.x, position.first.y);
 }
 
 void Player::mouseMovCb(double xpos, double ypos) {
