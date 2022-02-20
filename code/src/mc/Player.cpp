@@ -17,7 +17,7 @@ Player::Player(GLFWwindow* window, World& _w, glm::vec3 up) : w{_w}{
     yaw = 0;
     pitch = 0;
 
-    intervalOfCheck = 0.05f;
+    intervalOfCheck = 0.1;
     selectedBlock = TypeOfBlock::SAND;
 }
 

@@ -79,22 +79,27 @@ bool World::isBlock(glm::vec3 pos) {
     // if I see some trouble mean that i do not render properly the piece of world
     // the [] operator add the element to the map if it is no present but all the elmente I will check should be present in the map
     if(pos.y < 0) {
-        std::cout << "there is some trouble with the position for check blocks" <<std::endl;
+        // std::cout << "there is some trouble with the position for check blocks" <<std::endl;
         return false;
     }
+    // TODO put those in a funtion
     int sizeSide = nBlockSide * Block::DIMBLOCK;
     int xWorld = floor(pos.x / sizeSide);
     int zWorld = floor(pos.z / sizeSide);
-    int floorx = (int)floor(pos.x);
-    //int xPieceOfWorld = (int)floor(pos.x) % nBlockSide;
-    int xPieceOfWorld = floorx % sizeSide;
+    int xPieceOfWorld = (int)floor(pos.x) % nBlockSide;
     int zPieceOfWorld = (int)floor(pos.z) % sizeSide;
     int yPieceOfWorld = (int)floor(pos.y) ;
     return terrain[{xWorld, zWorld}].isBlock(xPieceOfWorld, yPieceOfWorld, zPieceOfWorld);
 }
 
 void World::breakBlock(glm::vec3 pos) {
-    terrain[{floor(pos.x / nBlockSide), floor(pos.z / nBlockSide)}].breakBlock(((int)floor(pos.x) % nBlockSide), pos.y, (((int)floor(pos.x) % nBlockSide)));
+    int sizeSide = nBlockSide * Block::DIMBLOCK;
+    int xWorld = floor(pos.x / sizeSide);
+    int zWorld = floor(pos.z / sizeSide);
+    int xPieceOfWorld = (int)floor(pos.x) % nBlockSide;
+    int zPieceOfWorld = (int)floor(pos.z) % sizeSide;
+    int yPieceOfWorld = (int)floor(pos.y) ;
+    terrain[{xWorld, zWorld}].breakBlock(xPieceOfWorld, yPieceOfWorld, zPieceOfWorld);
 }
 
 void World::addBlock(TypeOfBlock) {
