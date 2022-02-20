@@ -95,7 +95,7 @@ class PieceOfWorld {
          */
         void breakBlock(unsigned int x, unsigned int y, unsigned int z);
 
-        void addBlock(TypeOfBlock);
+        void addBlock(unsigned int x, unsigned int y, unsigned int z, TypeOfBlock type);
 
 };
 

@@ -22,6 +22,9 @@ class World {
         // Someway store chunkssss
         std::unordered_map<std::tuple<int, int>, PieceOfWorld, HashTuples::hash2tuple> terrain;
 
+        std::vector<std::pair<int, int>> getNearPieceOfWorld(int x, int z);
+        std::pair<int, int> currentPos;
+
     public:
 
         World(GLFWwindow* win, unsigned int seed);
@@ -38,19 +41,24 @@ class World {
         //std::vector<std::vector<unsigned int>> getAllIndicies();
 
         // This will update also the chunks that will be rendered each frame
-        void updatePos();
+        void updatePos(int x, int z);
 
         /**
          * Check if in a determinate position there is a block or not
          */
-        bool isBlock(glm::vec3 pos);
+        bool isBlock(glm::vec2 posOfPiece, glm::vec3 posOfBlock);
+        //bool isBlock(glm::vec3 pos);
 
         /**
          * Remove the block in the specified position
          */
-        void breakBlock(glm::vec3 pos);
+        void breakBlock(glm::vec2 posOfPiece, glm::vec3 posOfBlock);
+        //void breakBlock(glm::vec3 pos);
 
-        void addBlock(TypeOfBlock);
+        /**
+         * Add a specified block in a specified position
+         */
+        void addBlock(glm::vec2 posOfPiece, glm::vec3 posOfBlock, TypeOfBlock type);
 
         std::vector<std::shared_ptr<VertexArray> > getAllVertexArrays();
         std::vector<std::shared_ptr<ElementBuffer> > getAllElementBuffers();

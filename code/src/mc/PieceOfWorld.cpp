@@ -286,6 +286,12 @@ void PieceOfWorld::breakBlock(unsigned int x, unsigned int y, unsigned int z) {
     updateBuffers();
 }
 
+void PieceOfWorld::addBlock(unsigned int x, unsigned int y, unsigned int z, TypeOfBlock type) {
+    //std::cout << "Blocco da aggiungere : " << x << " " << y << " " << z << std::endl;
+    blocks[{x, y, z}] = type;
+    updateBuffers();
+}
+
 /**
  * Starting point
  * 0 0 0

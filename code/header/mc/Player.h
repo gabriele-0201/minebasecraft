@@ -31,7 +31,10 @@ class Player {
 
         World& w;
         float intervalOfCheck;
+        float maxNBlockInteract;
         TypeOfBlock selectedBlock;
+
+        std::pair<glm::vec2, glm::vec3> getBlockPos(glm::vec3 pos);
         
         
     public: 

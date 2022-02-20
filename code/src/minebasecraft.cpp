@@ -12,9 +12,9 @@ void mouseMovCbGeneral(GLFWwindow* window, double xpos, double ypos) {
 }
 
 void mouseButtonCbGeneral(GLFWwindow* window, int button, int action, int mods) {
-    //if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-        //p -> addBlock();
-    /*else*/ if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+        p -> addBlock();
+    else if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
         p -> breakBlock();
 }
 
