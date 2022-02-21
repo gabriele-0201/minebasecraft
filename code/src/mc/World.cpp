@@ -3,7 +3,7 @@
 
 #include "World.h"
 
-World::World(GLFWwindow* _win, unsigned int seed) : win{_win}{
+World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
 
     // For now only one piece 
     //terrain[{0,0}] = PieceOfWorld({0,0});
@@ -18,29 +18,44 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win}{
 
     currentPos = {0,0};
 
-    //srand(time(NULL));
+    srand(time(NULL));
     //noise.SetSeed(rand() % 100);
-    //noise.SetFrequency(0.01);
+    noiseGen.SetFrequency (0.5);
+    noiseGen.SetPersistence (0.25);
+    //noiseGen.SetFrequency(1.2);
+    //noiseGen.SetOctaveCount(8);
+     module::RidgedMulti mountainTerrain;
+
+    module::Billow baseFlatTerrain;
+    baseFlatTerrain.SetFrequency (2.0);
+
+    module::ScaleBias flatTerrain;
+    flatTerrain.SetSourceModule (0, baseFlatTerrain);
+    flatTerrain.SetScale (0.125);
+    flatTerrain.SetBias (-0.75);
+
+    module::Perlin terrainType;
+    terrainType.SetFrequency (0.5);
+    terrainType.SetPersistence (0.25);
+
+    finalTerrain.SetSourceModule (0, flatTerrain);
+    finalTerrain.SetSourceModule (1, mountainTerrain);
+    finalTerrain.SetControlModule (terrainType);
+    finalTerrain.SetBounds (0.0, 1000.0);
+    finalTerrain.SetEdgeFalloff (0.125);
     
     std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(0, 0);
     for(auto n: nears) {
         //std::cout << n.first << " " << n.second << std::endl;
 
-        utils::NoiseMapBuilderPlane mapBuilder;
-        mapBuilder.SetSourceModule(noise);
-        mapBuilder.SetDestNoiseMap(heighMap);
-        mapBuilder.SetDestSize(4, 4);
-        mapBuilder.SetBounds(n.first * nBlockSide, (n.first + 1) * nBlockSide, n.second * nBlockSide, (n.second + 1) * nBlockSide);
-        mapBuilder.Build();
-
-        terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, heighMap);
+        terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, finalTerrain);
     }
 
 }
 
 std::vector<std::pair<int, int>> World::getNearPieceOfWorld(int x, int z) {
 
-    int renderingPieces = 3;
+    int renderingPieces = 1;
     std::vector<std::pair<int, int>> nears {};
 
     for(int i = x - renderingPieces; i <= x + renderingPieces; ++i) {
@@ -146,15 +161,7 @@ void World::updatePos(int x, int z) {
 
         if(terrain.find({n.first, n.second}) == terrain.end()){
 
-            utils::NoiseMapBuilderPlane mapBuilder;
-            mapBuilder.SetSourceModule(noise);
-            mapBuilder.SetDestNoiseMap(heighMap);
-            mapBuilder.SetDestSize(4, 4);
-            //mapBuilder.SetBounds((float)(n.first * nBlockSide), (float)((n.first + 1) * nBlockSide), (float)(n.second * nBlockSide), (float)((n.second + 1) * nBlockSide));
-            mapBuilder.SetBounds (2.0, 6.0, 1.0, 5.0);
-            mapBuilder.Build();
-
-            terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, heighMap);
+            terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, finalTerrain);
             //std::cout << "New Piece: " << n.first << " " << n.second <<std::endl;
         }
 

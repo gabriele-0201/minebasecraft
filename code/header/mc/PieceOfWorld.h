@@ -73,12 +73,13 @@ class PieceOfWorld {
         std::shared_ptr<ElementBuffer> eb;
 
         void updateBuffers();
+        int noise(int x, int y, noise::module::Perlin& noise);
 
     public:
 
         // Some way to get NOISE
         PieceOfWorld();
-        PieceOfWorld(std::pair<int, int>, utils::NoiseMap& noiseMap);
+        PieceOfWorld(std::pair<int, int>, module::Select& finalTerrain);
 
         //std::vector<float> getVertecies() const;
         //std::vector<unsigned int> getIndecies() const;

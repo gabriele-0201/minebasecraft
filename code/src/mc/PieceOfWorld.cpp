@@ -7,7 +7,7 @@ PieceOfWorld::PieceOfWorld() {
 
 }
 
-PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, utils::NoiseMap& noiseMap) : pos{_pos} {
+PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, module::Select& finalTerrain) : pos{_pos} {
 
     // OFFEST ON THE RENDERING
     xoffset = pos.first * nBlockSide * Block::DIMBLOCK;
@@ -15,6 +15,20 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, utils::NoiseMap& noiseMap) 
 
     int xBlockoffset = pos.first * nBlockSide;
     int zBlockoffset = pos.second * nBlockSide;
+
+    if(pos.first > 0)
+        xBlockoffset = (pos.first - 1) * nBlockSide;
+    else if(pos.first = 0)
+        xBlockoffset = 0;
+    else
+        xBlockoffset = pos.first * nBlockSide;
+
+    if(pos.second > 0)
+        zBlockoffset = (pos.second - 1) * nBlockSide;
+    else if(pos.second = 0)
+        zBlockoffset = 0;
+    else
+        zBlockoffset = pos.second * nBlockSide;
 
     halfDim = (float)(Block::DIMBLOCK / 2);
 
@@ -28,16 +42,27 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, utils::NoiseMap& noiseMap) 
         for(int z = 0; z < nBlockSide; ++z) {
 
             // in the future hGrass is the result of a noise function
-            float noiseValue = noiseMap.GetValue(x, z);
 
             // PROPORTION: noise : 2 = x : 256 
-            std::cout << "noise " << noiseValue <<std::endl;
-            int yMax = floor((noiseValue * (float)50) / 2);
-            std::cout << "val y " << yMax <<std::endl;
 
-            for(int y = 0; y < yMax; ++y) {
-                blocks[{x, y, z}] = TypeOfBlock::GRASS;
+            //std::cout << "noise " << noiseValue <<std::endl;
+
+            int xWorld, zWorld;
+            //if(pos.first > 0)
+            xWorld = x + xBlockoffset;
+            zWorld = z + zBlockoffset;
+
+
+            //int yMax = noise(xWorld, zWorld, noiseObj);
+            int yMax = (finalTerrain.GetValue(xWorld + 0.001, zWorld + 0.001, 0.0f) + 1) * (256.0f / 2.0f);
+
+            //std::cout << "val y " << yMax <<std::endl;
+
+            for(int y = 0; y < yMax - 1; ++y) {
+                blocks[{x, y, z}] = TypeOfBlock::SOIL;
             }
+
+            blocks[{x, yMax - 1, z}] = TypeOfBlock::GRASS;
 
             /*
             for(int y = 0; y < hStone; ++y) {
@@ -69,6 +94,18 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, utils::NoiseMap& noiseMap) 
     layout -> push<float>(2);
 
     updateBuffers();
+}
+
+int PieceOfWorld::noise(int x, int y, noise::module::Perlin& noiseObj) {
+    // Scale from -1 : 1 to 0 : 255
+    // noise : 1 = x : 256
+    //double nx = x/nBlockSide;
+    //double ny = y/nBlockSide;
+    double nx = x + 0.001;
+    double ny = y + 0.001;
+    double freq = 1.2;
+    double noiseResult = noiseObj.GetValue(nx, ny, 0) / 2.0 + 0.5;
+    return floor(noiseResult * 256.0f);
 }
 
 void PieceOfWorld::updateBuffers() {
