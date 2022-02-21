@@ -134,11 +134,12 @@ void World::updatePos(int x, int z) {
     std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(currentPos.first, currentPos.second);
     for(auto n: nears) {
 
-        if(terrain.find({n.first, n.second}) == terrain.end())
+        if(terrain.find({n.first, n.second}) == terrain.end()){
             terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second});
+            //std::cout << "New Piece: " << n.first << " " << n.second <<std::endl;
+        }
 
     }
-    
 }
 
 bool World::isBlock(glm::vec2 posOfPiece, glm::vec3 posOfBlock) {
