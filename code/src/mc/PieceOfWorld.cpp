@@ -7,7 +7,7 @@ PieceOfWorld::PieceOfWorld() {
 
 }
 
-PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, noise::module::Perlin& noise) : pos{_pos} {
+PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, utils::NoiseMap& noiseMap) : pos{_pos} {
 
     // OFFEST ON THE RENDERING
     xoffset = pos.first * nBlockSide * Block::DIMBLOCK;
@@ -28,11 +28,11 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, noise::module::Perlin& nois
         for(int z = 0; z < nBlockSide; ++z) {
 
             // in the future hGrass is the result of a noise function
-            float noiseValue = noise.GetValue((float)(xBlockoffset * x) + 0.01f, (float)(zBlockoffset * z) + 0.01f, 0.5f) + 1.0f;
+            float noiseValue = noiseMap.GetValue(x, z);
 
             // PROPORTION: noise : 2 = x : 256 
             std::cout << "noise " << noiseValue <<std::endl;
-            int yMax = floor((noiseValue * (float)nBlockHeight) / 2);
+            int yMax = floor((noiseValue * (float)50) / 2);
             std::cout << "val y " << yMax <<std::endl;
 
             for(int y = 0; y < yMax; ++y) {

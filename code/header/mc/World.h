@@ -6,6 +6,8 @@
 #include <libnoise/noise.h>
 #include <time.h>
 
+#include "noiseutils.h"
+
 #include "Enums.h"
 #include "PieceOfWorld.h"
 #include "HashTuples.h"
@@ -28,6 +30,7 @@ class World {
         std::pair<int, int> currentPos;
 
         noise::module::Perlin noise;
+        utils::NoiseMap heighMap;
 
     public:
 

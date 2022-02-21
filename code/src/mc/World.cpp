@@ -18,14 +18,23 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win}{
 
     currentPos = {0,0};
 
+    //srand(time(NULL));
+    //noise.SetSeed(rand() % 100);
+    //noise.SetFrequency(0.01);
+    
     std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(0, 0);
     for(auto n: nears) {
         //std::cout << n.first << " " << n.second << std::endl;
-        terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, noise);
-    }
 
-    srand(time(NULL));
-    noise.SetSeed(rand() % 100);
+        utils::NoiseMapBuilderPlane mapBuilder;
+        mapBuilder.SetSourceModule(noise);
+        mapBuilder.SetDestNoiseMap(heighMap);
+        mapBuilder.SetDestSize(4, 4);
+        mapBuilder.SetBounds(n.first * nBlockSide, (n.first + 1) * nBlockSide, n.second * nBlockSide, (n.second + 1) * nBlockSide);
+        mapBuilder.Build();
+
+        terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, heighMap);
+    }
 
 }
 
@@ -136,7 +145,16 @@ void World::updatePos(int x, int z) {
     for(auto n: nears) {
 
         if(terrain.find({n.first, n.second}) == terrain.end()){
-            terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, noise);
+
+            utils::NoiseMapBuilderPlane mapBuilder;
+            mapBuilder.SetSourceModule(noise);
+            mapBuilder.SetDestNoiseMap(heighMap);
+            mapBuilder.SetDestSize(4, 4);
+            //mapBuilder.SetBounds((float)(n.first * nBlockSide), (float)((n.first + 1) * nBlockSide), (float)(n.second * nBlockSide), (float)((n.second + 1) * nBlockSide));
+            mapBuilder.SetBounds (2.0, 6.0, 1.0, 5.0);
+            mapBuilder.Build();
+
+            terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, heighMap);
             //std::cout << "New Piece: " << n.first << " " << n.second <<std::endl;
         }
 

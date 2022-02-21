@@ -6,6 +6,8 @@
 #include <memory>
 #include <libnoise/noise.h>
 
+#include "noiseutils.h"
+
 #include "Enums.h"
 #include "Block.h"
 #include "HashTuples.h"
@@ -76,7 +78,7 @@ class PieceOfWorld {
 
         // Some way to get NOISE
         PieceOfWorld();
-        PieceOfWorld(std::pair<int, int>, noise::module::Perlin& noise);
+        PieceOfWorld(std::pair<int, int>, utils::NoiseMap& noiseMap);
 
         //std::vector<float> getVertecies() const;
         //std::vector<unsigned int> getIndecies() const;
