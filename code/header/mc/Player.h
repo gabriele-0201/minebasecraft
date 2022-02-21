@@ -33,8 +33,12 @@ class Player {
         float intervalOfCheck;
         float maxNBlockInteract;
         TypeOfBlock selectedBlock;
+        std::pair<glm::vec2, glm::vec3> currentPos;
 
         std::pair<glm::vec2, glm::vec3> getBlockPos(glm::vec3 pos);
+        bool isEqual(std::pair<glm::vec2, glm::vec3>& p1, std::pair<glm::vec2, glm::vec3>& p2);
+        // copy the second argument into the first
+        void copy(std::pair<glm::vec2, glm::vec3>& p1, std::pair<glm::vec2, glm::vec3>& p2);
         
         
     public: 
@@ -48,6 +52,7 @@ class Player {
 
         glm::mat4 inline getViewMatrix() const { return viewMatrix; };
 
+        //void processKeyInput(GLFWwindow* window, int key, int action);
         void processKeyInput(GLFWwindow* window);
         void addBlock();
         void breakBlock();

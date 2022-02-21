@@ -29,6 +29,8 @@ void keyCb(GLFWwindow* window, int key, int scancode, int action, int mods) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     if (key == GLFW_KEY_V && action == GLFW_PRESS)
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+    //p -> processKeyInput(window, key, action);
 }
 
 int main(void) {
@@ -111,7 +113,6 @@ int main(void) {
         GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
         player.processKeyInput(window);
-        //shader.setUnifor4f("uColor", r, 0.0f, 0.0f, 0.5f);
 
         renderer.draw();
 

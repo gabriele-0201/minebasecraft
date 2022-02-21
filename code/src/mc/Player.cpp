@@ -38,8 +38,33 @@ void Player::processKeyInput(GLFWwindow* window) {
     viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
     // update position in the world
-    std::pair<glm::vec2, glm::vec3> position = getBlockPos(cameraPos);
-    w.updatePos(position.first.x, position.first.y);
+    std::pair<glm::vec2, glm::vec3> newPosition = getBlockPos(cameraPos);
+    if(!isEqual(newPosition, currentPos)) {
+        copy(currentPos, newPosition);
+        w.updatePos(currentPos.first.x, currentPos.first.y);
+    }
+    
+}
+
+bool Player::isEqual(std::pair<glm::vec2, glm::vec3>& p1, std::pair<glm::vec2, glm::vec3>& p2) {
+    return (
+        p1.first.x == p2.first.x &&
+        p1.first.y == p2.first.y &&
+        p1.second.x == p2.second.x &&
+        p1.second.y == p2.second.y &&
+        p1.second.z == p2.second.z
+    );
+}
+
+void Player::copy(std::pair<glm::vec2, glm::vec3>& p1, std::pair<glm::vec2, glm::vec3>& p2) {
+
+        p1.first.x = p2.first.x;
+        p1.first.y = p2.first.y;
+
+        p1.second.x = p2.second.x;
+        p1.second.y = p2.second.y;
+        p1.second.z = p2.second.z;
+
 }
 
 void Player::mouseMovCb(double xpos, double ypos) {
@@ -145,12 +170,7 @@ void Player::addBlock() {
         }
 
         // can't do simple =, I have to make a deep copy
-        previousBlock.first.x = blockPos.first.x;
-        previousBlock.first.y = blockPos.first.y;
-
-        previousBlock.second.x = blockPos.second.x;
-        previousBlock.second.y = blockPos.second.y;
-        previousBlock.second.z = blockPos.second.z;
+        copy(previousBlock, blockPos);
 
         multiplayer += intervalOfCheck;
 
