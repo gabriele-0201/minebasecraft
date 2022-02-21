@@ -21,16 +21,17 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win}{
     std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(0, 0);
     for(auto n: nears) {
         //std::cout << n.first << " " << n.second << std::endl;
-        terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second});
+        terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, noise);
     }
 
-    // HOW could I manage all the piece of the worlds?
+    srand(time(NULL));
+    noise.SetSeed(rand() % 100);
 
 }
 
 std::vector<std::pair<int, int>> World::getNearPieceOfWorld(int x, int z) {
 
-    int renderingPieces = 10;
+    int renderingPieces = 3;
     std::vector<std::pair<int, int>> nears {};
 
     for(int i = x - renderingPieces; i <= x + renderingPieces; ++i) {
@@ -135,7 +136,7 @@ void World::updatePos(int x, int z) {
     for(auto n: nears) {
 
         if(terrain.find({n.first, n.second}) == terrain.end()){
-            terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second});
+            terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, noise);
             //std::cout << "New Piece: " << n.first << " " << n.second <<std::endl;
         }
 

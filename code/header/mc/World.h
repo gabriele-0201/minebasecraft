@@ -3,6 +3,8 @@
 
 #include <unordered_map>
 #include <memory>
+#include <libnoise/noise.h>
+#include <time.h>
 
 #include "Enums.h"
 #include "PieceOfWorld.h"
@@ -24,6 +26,8 @@ class World {
 
         std::vector<std::pair<int, int>> getNearPieceOfWorld(int x, int z);
         std::pair<int, int> currentPos;
+
+        noise::module::Perlin noise;
 
     public:
 

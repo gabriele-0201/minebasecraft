@@ -7,11 +7,14 @@ PieceOfWorld::PieceOfWorld() {
 
 }
 
-PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos) : pos{_pos} {
+PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, noise::module::Perlin& noise) : pos{_pos} {
 
     // OFFEST ON THE RENDERING
     xoffset = pos.first * nBlockSide * Block::DIMBLOCK;
     zoffset = pos.second * nBlockSide * Block::DIMBLOCK;
+
+    int xBlockoffset = pos.first * nBlockSide;
+    int zBlockoffset = pos.second * nBlockSide;
 
     halfDim = (float)(Block::DIMBLOCK / 2);
 
@@ -25,6 +28,18 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos) : pos{_pos} {
         for(int z = 0; z < nBlockSide; ++z) {
 
             // in the future hGrass is the result of a noise function
+            float noiseValue = noise.GetValue((float)(xBlockoffset * x) + 0.01f, (float)(zBlockoffset * z) + 0.01f, 0.5f) + 1.0f;
+
+            // PROPORTION: noise : 2 = x : 256 
+            std::cout << "noise " << noiseValue <<std::endl;
+            int yMax = floor((noiseValue * (float)nBlockHeight) / 2);
+            std::cout << "val y " << yMax <<std::endl;
+
+            for(int y = 0; y < yMax; ++y) {
+                blocks[{x, y, z}] = TypeOfBlock::GRASS;
+            }
+
+            /*
             for(int y = 0; y < hStone; ++y) {
                 blocks[{x, y, z}] = TypeOfBlock::STONE;
             }
@@ -34,6 +49,7 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos) : pos{_pos} {
             for(int y = hSoil + hStone; y <  (hSoil + hStone + hGrass); ++y) {
                 blocks[{x, y, z}] = TypeOfBlock::GRASS;
             }
+            */
 
             //for(int y = hGrass; y < nBlockHeight; ++y) {
                 //blocks[{x, y, z}] = TypeOfBlock::SKY;

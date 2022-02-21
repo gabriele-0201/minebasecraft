@@ -30,3 +30,4 @@ Ricapotolandololo:
 [ ] - impostare tutta la classe player
 [ ] - Creare un correto vertex di ritorno dal world
 [ ] - in qualche modo combinare le due cose precedenti
+[ ] - NON far renderizzare facie tra pieceOfWorld

@@ -30,5 +30,6 @@ target_link_libraries(${PROJECT_NAME}
     GL
     GLEW
     glfw
-    
+    noise
+
 )
