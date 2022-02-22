@@ -5,6 +5,9 @@
 #include <vector>
 #include <memory>
 #include <libnoise/noise.h>
+#include <thread>
+#include <future>
+#include <chrono>
 
 #include "noiseutils.h"
 
@@ -51,6 +54,12 @@ class PieceOfWorld {
         float zoffset;
 
         float halfDim;
+
+        std::promise<bool> generated;
+        std::future<bool> future;
+        std::future_status status;
+        void genTerrain(module::Turbulence& finalTerrain);
+
         // Remember all the block, all the not specified block is
         std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
         //std::map<std::tuple<int, int, int>, int, HashTuples::hash3tuple> faces;
@@ -86,8 +95,8 @@ class PieceOfWorld {
 
         std::pair<int, int> inline getPos() { return pos; };
 
-        inline std::shared_ptr<VertexArray> getVertexArray() { return va; };
-        inline std::shared_ptr<ElementBuffer> getElementBuffer() { return eb; };
+        std::shared_ptr<VertexArray> getVertexArray();
+        std::shared_ptr<ElementBuffer> getElementBuffer();
 
         /**
          * Check if in a determinate position there is a block or not
@@ -100,7 +109,6 @@ class PieceOfWorld {
         void breakBlock(unsigned int x, unsigned int y, unsigned int z);
 
         void addBlock(unsigned int x, unsigned int y, unsigned int z, TypeOfBlock type);
-
 };
 
 #endif
