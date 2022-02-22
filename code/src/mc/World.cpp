@@ -19,30 +19,26 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
     currentPos = {0,0};
 
     srand(time(NULL));
-    //noise.SetSeed(rand() % 100);
-    noiseGen.SetFrequency (0.5);
-    noiseGen.SetPersistence (0.25);
-    //noiseGen.SetFrequency(1.2);
-    //noiseGen.SetOctaveCount(8);
-     module::RidgedMulti mountainTerrain;
 
-    module::Billow baseFlatTerrain;
+
     baseFlatTerrain.SetFrequency (2.0);
 
-    module::ScaleBias flatTerrain;
     flatTerrain.SetSourceModule (0, baseFlatTerrain);
     flatTerrain.SetScale (0.125);
     flatTerrain.SetBias (-0.75);
 
-    module::Perlin terrainType;
     terrainType.SetFrequency (0.5);
     terrainType.SetPersistence (0.25);
 
-    finalTerrain.SetSourceModule (0, flatTerrain);
-    finalTerrain.SetSourceModule (1, mountainTerrain);
-    finalTerrain.SetControlModule (terrainType);
-    finalTerrain.SetBounds (0.0, 1000.0);
-    finalTerrain.SetEdgeFalloff (0.125);
+    terrainSelector.SetSourceModule (0, flatTerrain);
+    terrainSelector.SetSourceModule (1, mountainTerrain);
+    terrainSelector.SetControlModule (terrainType);
+    terrainSelector.SetBounds (0.0, 1000.0);
+    terrainSelector.SetEdgeFalloff (0.125);
+
+    finalTerrain.SetSourceModule (0, terrainSelector);
+    finalTerrain.SetFrequency (4.0);
+    finalTerrain.SetPower (0.125);
     
     std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(0, 0);
     for(auto n: nears) {
@@ -55,7 +51,7 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
 
 std::vector<std::pair<int, int>> World::getNearPieceOfWorld(int x, int z) {
 
-    int renderingPieces = 1;
+    int renderingPieces = 6;
     std::vector<std::pair<int, int>> nears {};
 
     for(int i = x - renderingPieces; i <= x + renderingPieces; ++i) {

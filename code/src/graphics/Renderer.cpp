@@ -17,7 +17,8 @@ Renderer::Renderer(World& _w, Player& _p) :
     shader -> bind();
     shader -> setUniform1i("texId", 0);
 
-    proj = glm::perspective(glm::radians(p.fov), 1200.0f/ 900.0f, 0.1f, 100.0f);
+    distanceOfView = 1000.0f;
+    proj = glm::perspective(glm::radians(p.fov), 1200.0f/ 900.0f, 0.1f, distanceOfView);
     shader -> setUniform4Matrix("projection", proj);
 
 }
@@ -59,7 +60,7 @@ void Renderer::draw() {
 
 void Renderer::winSizeCb(float width, float height) {
 
-    proj = glm::perspective(glm::radians(p.fov), width / height, 0.1f, 100.0f);
+    proj = glm::perspective(glm::radians(p.fov), width / height, 0.1f, distanceOfView);
 
     glViewport(0, 0, width, height);
     shader -> setUniform4Matrix("projection", proj);

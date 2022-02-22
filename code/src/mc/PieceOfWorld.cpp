@@ -7,7 +7,7 @@ PieceOfWorld::PieceOfWorld() {
 
 }
 
-PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, module::Select& finalTerrain) : pos{_pos} {
+PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, module::Turbulence& finalTerrain) : pos{_pos} {
 
     // OFFEST ON THE RENDERING
     xoffset = pos.first * nBlockSide * Block::DIMBLOCK;
@@ -16,70 +16,58 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, module::Select& finalTerrai
     int xBlockoffset = pos.first * nBlockSide;
     int zBlockoffset = pos.second * nBlockSide;
 
-    if(pos.first > 0)
-        xBlockoffset = (pos.first - 1) * nBlockSide;
-    else if(pos.first = 0)
+    //if(pos.first > 0)
+        //xBlockoffset = pos.first * nBlockSide;
+    /*else*/ if(pos.first == 0)
         xBlockoffset = 0;
     else
         xBlockoffset = pos.first * nBlockSide;
 
-    if(pos.second > 0)
-        zBlockoffset = (pos.second - 1) * nBlockSide;
-    else if(pos.second = 0)
+    //if(pos.second > 0)
+        //zBlockoffset = pos.second * nBlockSide;
+    /*else*/ if(pos.second == 0)
         zBlockoffset = 0;
     else
         zBlockoffset = pos.second * nBlockSide;
 
     halfDim = (float)(Block::DIMBLOCK / 2);
 
-    // int hGrass = 5;
-    int hStone = 2;
-    int hSoil = 2;
+    int waterLevel = 80;
+    int hSoil = 5;
     int hGrass = 1;
+
+    int hLowSand = 75;
+    int hHighSand = 85;
 
     for(int x = 0; x < nBlockSide; ++x) {
 
         for(int z = 0; z < nBlockSide; ++z) {
 
-            // in the future hGrass is the result of a noise function
-
-            // PROPORTION: noise : 2 = x : 256 
-
-            //std::cout << "noise " << noiseValue <<std::endl;
 
             int xWorld, zWorld;
-            //if(pos.first > 0)
             xWorld = x + xBlockoffset;
             zWorld = z + zBlockoffset;
 
+            int heightCol = (finalTerrain.GetValue(xWorld * 0.001, zWorld * 0.001, 0.0f) + 1) * (256.0f / 2.0f);
 
-            //int yMax = noise(xWorld, zWorld, noiseObj);
-            int yMax = (finalTerrain.GetValue(xWorld + 0.001, zWorld + 0.001, 0.0f) + 1) * (256.0f / 2.0f);
-
-            //std::cout << "val y " << yMax <<std::endl;
-
-            for(int y = 0; y < yMax - 1; ++y) {
-                blocks[{x, y, z}] = TypeOfBlock::SOIL;
+            for(int y = 0; y < heightCol; ++y) {
+                
+                if(y <= hHighSand && y >= hLowSand)
+                    blocks[{x, y, z}] = TypeOfBlock::SAND;
+                
+                if(y >= hHighSand - hGrass)
+                    blocks[{x, y, z}] = TypeOfBlock::GRASS;
+                else if(y >= hHighSand - hGrass - hSoil) 
+                    blocks[{x, y, z}] = TypeOfBlock::SOIL;
+                else            
+                    blocks[{x, y, z}] = TypeOfBlock::STONE;
             }
 
-            blocks[{x, yMax - 1, z}] = TypeOfBlock::GRASS;
-
-            /*
-            for(int y = 0; y < hStone; ++y) {
-                blocks[{x, y, z}] = TypeOfBlock::STONE;
-            }
-            for(int y = hStone; y < (hSoil + hStone); ++y) {
-                blocks[{x, y, z}] = TypeOfBlock::SOIL;
-            }
-            for(int y = hSoil + hStone; y <  (hSoil + hStone + hGrass); ++y) {
-                blocks[{x, y, z}] = TypeOfBlock::GRASS;
-            }
-            */
-
-            //for(int y = hGrass; y < nBlockHeight; ++y) {
-                //blocks[{x, y, z}] = TypeOfBlock::SKY;
-                //std::cout <<x << " : " << y << " : " <<z <<std::endl;
+            //for(int y = heightCol; y < waterLevel; ++y) {
+                //blocks[{x, y, z}] = TypeOfBlock::WATER;
             //}
+
+
         }
     }
     
@@ -149,6 +137,16 @@ void PieceOfWorld::updateBuffers() {
 
                 // TEST not assign SKY type, if is not in the map so it is sky
                 // [] operator is not const
+
+                // Check out of bounds: (n=only for now)
+
+                if(std::get<0>(coordinates) + dir.x < 0 || std::get<0>(coordinates) + dir.x >= nBlockSide)
+                    continue;
+                if(std::get<1>(coordinates) + dir.y < 0)
+                    continue;
+                if(std::get<2>(coordinates) + dir.z < 0 || std::get<2>(coordinates) + dir.z >= nBlockSide)
+                    continue;
+
                 auto checkValue = blocks.find({std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, std::get<2>(coordinates) + dir.z});
                 // THIS solution is only for now, because I'm rendering all the freaking faces beteween chunks
                 // RENDER also the side of the the face to other chunks

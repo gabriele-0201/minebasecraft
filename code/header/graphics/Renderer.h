@@ -20,6 +20,7 @@ class Renderer {
         World& w;
         Player& p;
         glm::mat4 proj;
+        float distanceOfView;
 
         //std::unique_ptr<VertexArray> va;
         //std::unique_ptr<VertexBuffer> vb;

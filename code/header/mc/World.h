@@ -29,9 +29,12 @@ class World {
         std::vector<std::pair<int, int>> getNearPieceOfWorld(int x, int z);
         std::pair<int, int> currentPos;
 
-        noise::module::Perlin noiseGen;
-        module::Select finalTerrain;
-        //utils::NoiseMap heighMap;
+        module::RidgedMulti mountainTerrain;
+        module::Billow baseFlatTerrain;
+        module::ScaleBias flatTerrain;
+        module::Perlin terrainType;
+        module::Select terrainSelector;
+        module::Turbulence finalTerrain;
 
     public:
 
