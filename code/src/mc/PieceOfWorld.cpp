@@ -297,6 +297,7 @@ std::shared_ptr<VertexArray> PieceOfWorld::getVertexArray() {
     if(va == nullptr) {
         va = std::shared_ptr<VertexArray>{ new VertexArray{} };
         blocks = fut.get();
+        std::cout << "start update " <<std::endl;
         updateBuffers();
     }
 

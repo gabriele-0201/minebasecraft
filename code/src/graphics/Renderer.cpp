@@ -42,7 +42,9 @@ void Renderer::draw() {
 
     for(int i = 0; i < vas.size(); ++i) {
 
+        std::cout << "try to bind ";
         vas[i] -> bind();
+        std::cout << "heres the errrro";
         ebs[i] -> bind();
 
         GLCall(glDrawElements(GL_TRIANGLES, ebs[i] -> getCount(), GL_UNSIGNED_INT, nullptr));

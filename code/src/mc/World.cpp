@@ -62,25 +62,44 @@ std::vector<std::pair<int, int>> World::getNearPieceOfWorld(int x, int z) {
     return nears;
 }
 
+static std::mutex sArrMutex;
+static void loadVA(std::unordered_map<std::tuple<int, int>, PieceOfWorld, HashTuples::hash2tuple>* terrain, std::vector<std::shared_ptr<VertexArray>>* arr, int x, int z) {
+
+    //std::lock_guard<std::mutex> lock(sArrMutex);
+    sArrMutex.lock();
+    arr -> push_back(terrain -> operator[]({x, z}).getVertexArray());
+    sArrMutex.unlock();
+
+}
+
 std::vector<std::shared_ptr<VertexArray> > World::getAllVertexArrays() {
 
     std::vector<std::shared_ptr<VertexArray>> arrays{};
 
     // someway reduce the chunks that will be calculed
 
-    //std::cout <<" RENDERING " <<std::endl;
+    std::vector<std::future<void>> futs {};
     std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(currentPos.first, currentPos.second);
     for(auto n: nears) {
 
         //std::cout << n.first << " " << n.second << std::endl;
-
-        arrays.push_back(terrain[{n.first, n.second}].getVertexArray());
+        
+        //arrays.push_back(terrain[{n.first, n.second}].getVertexArray());
+        futs.push_back(std::async(std::launch::async, loadVA, &terrain, &arrays, n.first, n.second));
+        std::cout << "asked for VA" <<std::endl;
 
 
         //if(terrain.find({n.first, n.second}) != terrain.end())
             //terrain[n.first, n.second] = PieceOfWorld({n.first, n.second});
 
     }
+
+    std::cout << "waiting for finish" <<std::endl;
+
+    for(auto& f: futs)
+        f.get();
+
+    std::cout << "finish" <<std::endl;
 
     //for(auto itr = terrain.begin(); itr != terrain.end(); ++itr) {
         //arrays.push_back((itr -> second).getVertexArray());

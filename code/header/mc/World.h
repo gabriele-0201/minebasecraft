@@ -5,6 +5,7 @@
 #include <memory>
 #include <libnoise/noise.h>
 #include <time.h>
+#include <future>
 
 #include "noiseutils.h"
 
