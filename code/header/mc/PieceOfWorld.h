@@ -5,7 +5,6 @@
 #include <vector>
 #include <memory>
 #include <libnoise/noise.h>
-#include <thread>
 #include <future>
 #include <chrono>
 
@@ -55,10 +54,7 @@ class PieceOfWorld {
 
         float halfDim;
 
-        std::promise<bool> generated;
-        std::future<bool> future;
-        std::future_status status;
-        void genTerrain(module::Turbulence& finalTerrain);
+        std::future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>> fut;
 
         // Remember all the block, all the not specified block is
         std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
@@ -83,6 +79,9 @@ class PieceOfWorld {
 
         void updateBuffers();
         int noise(int x, int y, noise::module::Perlin& noise);
+
+        template<class T>
+        bool is_ready(std::future<T> const& f);
 
     public:
 

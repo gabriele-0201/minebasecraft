@@ -5,6 +5,48 @@
 
 using namespace std::chrono_literals;
 
+std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> genTerrain(int xBlockOffest, int zBockOffset, module::Turbulence& finalTerrain) {
+
+    std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
+
+    int waterLevel = 80;
+    int hSoil = 5;
+    int hGrass = 1;
+
+    int hLowSand = 75;
+    int hHighSand = 85;
+
+    for(int x = 0; x < nBlockSide; ++x) {
+
+        for(int z = 0; z < nBlockSide; ++z) {
+
+
+            int xWorld, zWorld;
+            xWorld = x + xBlockOffest;
+            zWorld = z + zBockOffset;
+
+            int heightCol = (finalTerrain.GetValue(xWorld * 0.001, zWorld * 0.001, 0.0f) + 1) * (256.0f / 2.0f);
+
+            for(int y = 0; y < heightCol; ++y) {
+                
+                if(y <= hHighSand && y >= hLowSand)
+                    blocks[{x, y, z}] = TypeOfBlock::SAND;
+                
+                if(y >= hHighSand - hGrass)
+                    blocks[{x, y, z}] = TypeOfBlock::GRASS;
+                else if(y >= hHighSand - hGrass - hSoil) 
+                    blocks[{x, y, z}] = TypeOfBlock::SOIL;
+                else            
+                    blocks[{x, y, z}] = TypeOfBlock::STONE;
+            }
+
+            //for(int y = heightCol; y < waterLevel; ++y) {
+                //blocks[{x, y, z}] = TypeOfBlock::WATER;
+            //}
+        }
+    }
+    return blocks;
+}
 
 PieceOfWorld::PieceOfWorld() {
 
@@ -17,68 +59,14 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, module::Turbulence& finalTe
     zoffset = pos.second * nBlockSide * Block::DIMBLOCK;
 
     halfDim = (float)(Block::DIMBLOCK / 2);
-
-    /*
+    
     int xBlockoffset = pos.first * nBlockSide;
     int zBlockoffset = pos.second * nBlockSide;
 
-     if(pos.first == 0)
-        xBlockoffset = 0;
-    else
-        xBlockoffset = pos.first * nBlockSide;
-
-     if(pos.second == 0)
-        zBlockoffset = 0;
-    else
-        zBlockoffset = pos.second * nBlockSide;
-
-    int waterLevel = 80;
-    int hSoil = 5;
-    int hGrass = 1;
-
-    int hLowSand = 75;
-    int hHighSand = 85;
-
-    for(int x = 0; x < nBlockSide; ++x) {
-
-        for(int z = 0; z < nBlockSide; ++z) {
-
-
-            int xWorld, zWorld;
-            xWorld = x + xBlockoffset;
-            zWorld = z + zBlockoffset;
-
-            int heightCol = (finalTerrain.GetValue(xWorld * 0.001, zWorld * 0.001, 0.0f) + 1) * (256.0f / 2.0f);
-
-            for(int y = 0; y < heightCol; ++y) {
-                
-                if(y <= hHighSand && y >= hLowSand)
-                    blocks[{x, y, z}] = TypeOfBlock::SAND;
-                
-                if(y >= hHighSand - hGrass)
-                    blocks[{x, y, z}] = TypeOfBlock::GRASS;
-                else if(y >= hHighSand - hGrass - hSoil) 
-                    blocks[{x, y, z}] = TypeOfBlock::SOIL;
-                else            
-                    blocks[{x, y, z}] = TypeOfBlock::STONE;
-            }
-
-            //for(int y = heightCol; y < waterLevel; ++y) {
-                //blocks[{x, y, z}] = TypeOfBlock::WATER;
-            //}
-
-
-        }
-    }
-    */
-
-    future = generated.get_future();
-    std::thread t(&PieceOfWorld::genTerrain, this, finalTerrain);
-
+    fut = std::async(std::launch::async, genTerrain, xBlockoffset, zBlockoffset, std::ref(finalTerrain));
     
-    //blocks[{0, 15, 0}] = TypeOfBlock::GRASS;
-
-    va = std::shared_ptr<VertexArray>{ new VertexArray{} };
+    //va = std::shared_ptr<VertexArray>{ new VertexArray{} };
+    va = std::shared_ptr<VertexArray>{ nullptr };
     vb = std::shared_ptr<VertexBuffer>{ new VertexBuffer{} };
     eb = std::shared_ptr<ElementBuffer>{ new ElementBuffer{nullptr, 0} };
     
@@ -89,67 +77,6 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, module::Turbulence& finalTe
     //updateBuffers();
 }
 
-void PieceOfWorld::genTerrain(module::Turbulence& finalTerrain) {
-    
-    //std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
-
-    int xBlockoffset = pos.first * nBlockSide;
-    int zBlockoffset = pos.second * nBlockSide;
-
-     if(pos.first == 0)
-        xBlockoffset = 0;
-    else
-        xBlockoffset = pos.first * nBlockSide;
-
-     if(pos.second == 0)
-        zBlockoffset = 0;
-    else
-        zBlockoffset = pos.second * nBlockSide;
-
-    int waterLevel = 80;
-    int hSoil = 5;
-    int hGrass = 1;
-
-    int hLowSand = 75;
-    int hHighSand = 85;
-
-    for(int x = 0; x < nBlockSide; ++x) {
-
-        for(int z = 0; z < nBlockSide; ++z) {
-
-
-            int xWorld, zWorld;
-            xWorld = x + xBlockoffset;
-            zWorld = z + zBlockoffset;
-
-            int heightCol = (finalTerrain.GetValue(xWorld * 0.001, zWorld * 0.001, 0.0f) + 1) * (256.0f / 2.0f);
-
-            for(int y = 0; y < heightCol; ++y) {
-                
-                if(y <= hHighSand && y >= hLowSand)
-                    blocks[{x, y, z}] = TypeOfBlock::SAND;
-                
-                if(y >= hHighSand - hGrass)
-                    blocks[{x, y, z}] = TypeOfBlock::GRASS;
-                else if(y >= hHighSand - hGrass - hSoil) 
-                    blocks[{x, y, z}] = TypeOfBlock::SOIL;
-                else            
-                    blocks[{x, y, z}] = TypeOfBlock::STONE;
-            }
-
-            //for(int y = heightCol; y < waterLevel; ++y) {
-                //blocks[{x, y, z}] = TypeOfBlock::WATER;
-            //}
-
-
-        }
-    }
-
-    updateBuffers();
-
-    generated.set_value(true);
-
-}
 
 int PieceOfWorld::noise(int x, int y, noise::module::Perlin& noiseObj) {
     // Scale from -1 : 1 to 0 : 255
@@ -255,6 +182,7 @@ std::vector<float> PieceOfWorld::getVerteciesOfAFace(unsigned int xBlock, unsign
 
     //std::cout << "half dim " << halfDim <<std::endl;
 
+
     float xCenter = ((float)(Block::DIMBLOCK * xBlock)) + halfDim;
     float yCenter = ((float)(Block::DIMBLOCK * yBlock)) + halfDim;
     float zCenter = ((float)(Block::DIMBLOCK * zBlock)) + halfDim;
@@ -314,46 +242,6 @@ std::vector<unsigned int> PieceOfWorld::getIndecesOfAFace(int counter) const {
         data.push_back(indOfFaces[i] + counter * 4);
     return data;
 }
-/*
-std::vector<float> PieceOfWorld::getVertecies() const {
-    std::vector<float> data{};
-
-    for(auto itr = blocks.begin(); itr != blocks.end(); ++itr) {
-
-        if((itr -> second) == TypeOfBlock::SKY)
-            continue;
-            
-        std::tuple<int, int, int> coordinates = itr -> first;
-        std::vector<float> vertecies = getVerteciesOfBlock(std::get<0>(coordinates), std::get<1>(coordinates), std::get<2>(coordinates));
-
-        data.insert(data.end(), vertecies.begin(), vertecies.end());
-    }
-
-    //for(auto i : data)
-        //std::cout << i << " " <<std::endl;
-
-    return data;
-}
-
-std::vector<unsigned int> PieceOfWorld::getIndecies() const {
-    std::vector<unsigned int> data{};
-
-    int counter = 0;
-
-    while(counter < blocks.size()) {
-        std::vector<unsigned int> vertecies = getIndecesOfBlock(counter);
-
-        data.insert(data.end(), vertecies.begin(), vertecies.end());
-
-        counter++;
-    }
-
-    //for(auto i : data)
-        //std::cout << i << " " <<std::endl;
-
-    return data;
-}
-*/
 
 std::vector<unsigned int> PieceOfWorld::getIndecesOfBlock(int counter) const {
     std::vector<unsigned int> data;
@@ -405,20 +293,33 @@ void PieceOfWorld::addBlock(unsigned int x, unsigned int y, unsigned int z, Type
 }
 
 std::shared_ptr<VertexArray> PieceOfWorld::getVertexArray() {
-    status == future.wait_for(0ms);
-    if (status == std::future_status::ready)
-        return va;
-    else 
-        return {nullptr};
+
+    if(va == nullptr) {
+        va = std::shared_ptr<VertexArray>{ new VertexArray{} };
+        blocks = fut.get();
+        updateBuffers();
+    }
+
+    return va;
+
 }
 
 std::shared_ptr<ElementBuffer> PieceOfWorld::getElementBuffer() {
-    status == future.wait_for(0ms);
-    if (status == std::future_status::ready)
-        return eb;
-    else 
-        return {nullptr};
+
+    if(va == nullptr) {
+        va = std::shared_ptr<VertexArray>{ new VertexArray{} };
+        blocks = fut.get();
+        updateBuffers();
+    }
+
+    return eb;
 }
+
+template<typename T>
+bool PieceOfWorld::is_ready(std::future<T> const& f) { 
+    return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready; 
+}
+
 /**
  * Starting point
  * 0 0 0
@@ -433,6 +334,8 @@ std::shared_ptr<ElementBuffer> PieceOfWorld::getElementBuffer() {
  * -1 -1  1 - 7
  *  1 -1  1 - 8
 */
+
+
 
 
 #endif

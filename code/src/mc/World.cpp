@@ -20,7 +20,6 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
 
     srand(time(NULL));
 
-
     baseFlatTerrain.SetFrequency (2.0);
 
     flatTerrain.SetSourceModule (0, baseFlatTerrain);
@@ -51,7 +50,7 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
 
 std::vector<std::pair<int, int>> World::getNearPieceOfWorld(int x, int z) {
 
-    int renderingPieces = 6;
+    int renderingPieces = 3;
     std::vector<std::pair<int, int>> nears {};
 
     for(int i = x - renderingPieces; i <= x + renderingPieces; ++i) {
@@ -116,36 +115,6 @@ std::vector<std::shared_ptr<ElementBuffer> > World::getAllElementBuffers() {
 
 }
 
-
-
-/*
-std::vector<float> World::getAllVertecies() {
-
-    std::vector<float> buffers{};
-    //buffers.push_back(std::vector<float> {});
-
-    // someway reduce the chunks that will be calculed
-    for(auto itr = terrain.begin(); itr != terrain.end(); ++itr) {
-        std::vector<float> vertecies = (itr -> second).getVertecies();
-        buffers.insert(buffers.end(), vertecies.begin(), vertecies.end());
-    }
-    return buffers;
-}
-
-std::vector<std::vector<unsigned int>> World::getAllIndicies() {
-
-    std::vector<std::vector<unsigned int>> buffers{};
-    buffers.push_back(std::vector<unsigned int> {});
-
-    // someway reduce the chunks that will be calculed
-    for(auto itr = terrain.begin(); itr != terrain.end(); ++itr) {
-       buffers.push_back((itr -> second).getIndecies());
-    }
-
-    return buffers;
-}
-*/
-
 // This will update also the chunks that will be rendered each frame
 void World::updatePos(int x, int z) {
 
@@ -177,5 +146,6 @@ void World::breakBlock(glm::vec2 posOfPiece, glm::vec3 posOfBlock) {
 void World::addBlock(glm::vec2 posOfPiece, glm::vec3 posOfBlock, TypeOfBlock type) {
     terrain[{posOfPiece.x, posOfPiece.y}].addBlock(posOfBlock.x, posOfBlock.y, posOfBlock.z, type);
 }
+
 
 #endif
