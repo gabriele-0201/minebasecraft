@@ -42,6 +42,14 @@ namespace Block {
                 pos.first = 16;
                 pos.second = 4;
                 break;
+            case TypeOfBlock::SNOW:
+                pos.first = 14;
+                pos.second = 4;
+                break;
+            case TypeOfBlock::WATER:
+                pos.first = 1;
+                pos.second = 0;
+                break;
             default:
                 break;
         } 

@@ -9,13 +9,6 @@ std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tupl
 
     std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
 
-    int waterLevel = 80;
-    int hSoil = 5;
-    int hGrass = 1;
-
-    int hLowSand = 75;
-    int hHighSand = 85;
-
     for(int x = 0; x < nBlockSide; ++x) {
 
         for(int z = 0; z < nBlockSide; ++z) {
@@ -28,160 +21,28 @@ std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tupl
             int heightCol = (finalTerrain.GetValue(xWorld * 0.001, zWorld * 0.001, 0.0f) + 1) * (256.0f / 2.0f);
 
             for(int y = 0; y < heightCol; ++y) {
-                
-                if(y <= hHighSand && y >= hLowSand)
-                    blocks[{x, y, z}] = TypeOfBlock::SAND;
-                
-                if(y >= hHighSand - hGrass)
-                    blocks[{x, y, z}] = TypeOfBlock::GRASS;
-                else if(y >= hHighSand - hGrass - hSoil) 
-                    blocks[{x, y, z}] = TypeOfBlock::SOIL;
-                else            
-                    blocks[{x, y, z}] = TypeOfBlock::STONE;
+
+                if (y < 70) blocks[{x, y, z}] = TypeOfBlock::STONE;
+                else if (y < 80) blocks[{x, y, z}] = TypeOfBlock::SAND;
+                else if (y < 130) blocks[{x, y, z}] = TypeOfBlock::SOIL;
+                else if (y < 170) blocks[{x, y, z}] = TypeOfBlock::STONE;
+                else blocks[{x, y, z}] = TypeOfBlock::SNOW;
+
             }
 
-            //for(int y = heightCol; y < waterLevel; ++y) {
-                //blocks[{x, y, z}] = TypeOfBlock::WATER;
-            //}
+            for(int y = heightCol; y < 70; ++y) {
+                blocks[{x, y, z}] = TypeOfBlock::WATER;
+            }
+
+            if(blocks[{x, heightCol - 1, z}] == TypeOfBlock::STONE || blocks[{x, heightCol - 1, z}] == TypeOfBlock::SOIL)
+                blocks[{x, heightCol - 1, z}] == TypeOfBlock::GRASS;
+
         }
     }
     return blocks;
 }
 
-PieceOfWorld::PieceOfWorld() {
-
-}
-
-PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, module::Turbulence& finalTerrain) : pos{_pos} {
-
-    // OFFEST ON THE RENDERING
-    xoffset = pos.first * nBlockSide * Block::DIMBLOCK;
-    zoffset = pos.second * nBlockSide * Block::DIMBLOCK;
-
-    halfDim = (float)(Block::DIMBLOCK / 2);
-    
-    int xBlockoffset = pos.first * nBlockSide;
-    int zBlockoffset = pos.second * nBlockSide;
-
-    fut = std::async(std::launch::async, genTerrain, xBlockoffset, zBlockoffset, std::ref(finalTerrain));
-    
-    //va = std::shared_ptr<VertexArray>{ new VertexArray{} };
-    va = std::shared_ptr<VertexArray>{ nullptr };
-    vb = std::shared_ptr<VertexBuffer>{ new VertexBuffer{} };
-    eb = std::shared_ptr<ElementBuffer>{ new ElementBuffer{nullptr, 0} };
-    
-    layout = std::shared_ptr<VertexBufferLayout> { new VertexBufferLayout{} };
-    layout -> push<float>(3);
-    layout -> push<float>(2);
-
-    //updateBuffers();
-}
-
-
-int PieceOfWorld::noise(int x, int y, noise::module::Perlin& noiseObj) {
-    // Scale from -1 : 1 to 0 : 255
-    // noise : 1 = x : 256
-    //double nx = x/nBlockSide;
-    //double ny = y/nBlockSide;
-    double nx = x + 0.001;
-    double ny = y + 0.001;
-    double freq = 1.2;
-    double noiseResult = noiseObj.GetValue(nx, ny, 0) / 2.0 + 0.5;
-    return floor(noiseResult * 256.0f);
-}
-
-void PieceOfWorld::updateBuffers() {
-
-    std::vector<float> vertecies{};
-    std::vector<unsigned int> indeces{};
-    int counter = 0;
-
-    for(auto itr = blocks.begin(); itr != blocks.end(); ++itr) {
-
-        if((itr -> second) == TypeOfBlock::SKY)
-            continue;
-            
-        // work on vertecies
-        std::tuple<int, int, int> coordinates = itr -> first;
-        // Get vertecies of only the usefull faces
-
-        for(int i = 0; i < 3; ++i) {
-            for(int j = -1; j <= 1; j += 2) {
-
-                glm::vec3 dir (0.0f, 0.0f, 0.0f);
-
-                switch (i)  {
-                    case 0:
-                        dir.x = (float)j;
-                        break;
-                    case 1:
-                        dir.y = (float)j;
-                        break;
-                    case 2:
-                        dir.z = (float)j;
-                        break;
-                }
-
-
-                // TEST not assign SKY type, if is not in the map so it is sky
-                // [] operator is not const
-
-                // Check out of bounds: (n=only for now)
-
-                if(std::get<0>(coordinates) + dir.x < 0 || std::get<0>(coordinates) + dir.x >= nBlockSide)
-                    continue;
-                if(std::get<1>(coordinates) + dir.y < 0)
-                    continue;
-                if(std::get<2>(coordinates) + dir.z < 0 || std::get<2>(coordinates) + dir.z >= nBlockSide)
-                    continue;
-
-                auto checkValue = blocks.find({std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, std::get<2>(coordinates) + dir.z});
-                // THIS solution is only for now, because I'm rendering all the freaking faces beteween chunks
-                // RENDER also the side of the the face to other chunks
-                if(checkValue != blocks.end() && checkValue -> second != TypeOfBlock::SKY)
-                    continue;
-
-                //std::cout << std::get<0>(coordinates) << " " << std::get<1>(coordinates) << " " << std::get<2>(coordinates) << " " << std::endl;
-                //std::cout << dir.x << " " << dir.y << " " << dir.z << " " << std::endl;
-
-                std::vector<float> blockCoords = getVerteciesOfAFace(std::get<0>(coordinates), std::get<1>(coordinates), std::get<2>(coordinates), dir, itr -> second);
-                
-                // std::vector<float> test {0.0f, 0.0f, 0.0f};
-                // if(blockCoords == test)
-                //     std::cout << counter <<std::endl;
-                
-                vertecies.insert(vertecies.end(), blockCoords.begin(), blockCoords.end());
-
-                // work on indeces
-                std::vector<unsigned int> blockInds = getIndecesOfAFace(counter);
-                indeces.insert(indeces.end(), blockInds.begin(), blockInds.end());
-                counter++;
-
-            }
-        }
-    }
-
-    //std::cout << counter << std::endl;
-
-    // Degub
-    // for(auto i : vertecies)
-    //    std::cout << i << " " <<std::endl;
-    // std::cout << " Fine vertici " <<std::endl;
-    // for(auto i : indeces)
-    //    std::cout << i << " " <<std::endl;
-
-    vb -> updateData(&(vertecies[0]), (counter * 4) * 5 * sizeof(float));
-    va -> bindVb(*vb, *layout);
-
-    // update also the idex buffer in the future (when I will render more than one cube)
-    // SIX indeces for each face
-    eb -> updateData(&(indeces[0]), counter * 6);
-}
-
-std::vector<float> PieceOfWorld::getVerteciesOfAFace(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, glm::vec3 dir, TypeOfBlock type) {
-
-    //std::cout << "half dim " << halfDim <<std::endl;
-
+std::vector<float> getVerteciesOfAFace(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, float halfDim, float xoffset, float zoffset, glm::vec3 dir, TypeOfBlock type) {
 
     float xCenter = ((float)(Block::DIMBLOCK * xBlock)) + halfDim;
     float yCenter = ((float)(Block::DIMBLOCK * yBlock)) + halfDim;
@@ -199,7 +60,6 @@ std::vector<float> PieceOfWorld::getVerteciesOfAFace(unsigned int xBlock, unsign
     for(int i = -1; i <= 1; i += 2) {
 
         for(int j = -1; j <= 1; j += 2) {
-
 
             if(dir.x != 0) {
 
@@ -236,44 +96,130 @@ std::vector<float> PieceOfWorld::getVerteciesOfAFace(unsigned int xBlock, unsign
     return vertecies;
 }
 
-std::vector<unsigned int> PieceOfWorld::getIndecesOfAFace(int counter) const {
+std::vector<unsigned int> getIndecesOfAFace(unsigned int counter) {
     std::vector<unsigned int> data;
     for(int i = 0; i < 6; ++i) 
         data.push_back(indOfFaces[i] + counter * 4);
     return data;
 }
 
-std::vector<unsigned int> PieceOfWorld::getIndecesOfBlock(int counter) const {
-    std::vector<unsigned int> data;
-    for(int i = 0; i < 36; ++i) 
-        data.push_back(ind[i] + counter * 8);
-    return data;
-}
-
-
-//std::vector<float> PieceOfWorld::getVertecies(float xCenter, float yCenter, float zCenter) const {
-std::vector<float> PieceOfWorld::getVerteciesOfBlock(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock) const {
-
-    float xCenter = (float)(Block::DIMBLOCK * xBlock) + halfDim;
-    float yCenter = (float)(Block::DIMBLOCK * yBlock) + halfDim;
-    float zCenter = (float)(Block::DIMBLOCK * zBlock) + halfDim;
+std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int> genBuffers(std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>* blocks, float halfDim, float xoffset, float zoffset) {
 
     std::vector<float> vertecies{};
-    for(int y = 1; y >= -1; y -= 2) {
+    std::vector<unsigned int> indeces{};
+    unsigned int counter = 0;
 
-        for(int z = -1; z <= 1; z += 2) {
+    for(auto itr = blocks -> begin(); itr != blocks -> end(); ++itr) {
 
-            for(int x = -1; x <= 1; x += 2) {
+        if((itr -> second) == TypeOfBlock::SKY)
+            continue;
+            
+        // work on vertecies
+        std::tuple<int, int, int> coordinates = itr -> first;
+        // Get vertecies of only the usefull faces
 
-                vertecies.push_back(xoffset + xCenter + (float)(halfDim * x));
-                vertecies.push_back(yCenter + (float)(halfDim * y));
-                vertecies.push_back(zoffset + zCenter + (float)(halfDim * z));
+        for(int i = 0; i < 3; ++i) {
+            for(int j = -1; j <= 1; j += 2) {
+
+                glm::vec3 dir (0.0f, 0.0f, 0.0f);
+
+                switch (i)  {
+                    case 0:
+                        dir.x = (float)j;
+                        break;
+                    case 1:
+                        dir.y = (float)j;
+                        break;
+                    case 2:
+                        dir.z = (float)j;
+                        break;
+                }
+
+
+                // TEST not assign SKY type, if is not in the map so it is sky
+                // [] operator is not const
+
+                // Check out of bounds: (n=only for now)
+
+                /*
+                if(std::get<0>(coordinates) + dir.x < 0 || std::get<0>(coordinates) + dir.x >= nBlockSide)
+                    continue;
+                if(std::get<1>(coordinates) + dir.y < 0)
+                    continue;
+                if(std::get<2>(coordinates) + dir.z < 0 || std::get<2>(coordinates) + dir.z >= nBlockSide)
+                    continue;
+                */
+
+                auto checkValue = blocks -> find({std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, std::get<2>(coordinates) + dir.z});
+                // THIS solution is only for now, because I'm rendering all the freaking faces beteween chunks
+                // RENDER also the side of the the face to other chunks
+                if(checkValue != blocks -> end() && checkValue -> second != TypeOfBlock::SKY)
+                    continue;
+
+                //std::cout << std::get<0>(coordinates) << " " << std::get<1>(coordinates) << " " << std::get<2>(coordinates) << " " << std::endl;
+                //std::cout << dir.x << " " << dir.y << " " << dir.z << " " << std::endl;
+
+                std::vector<float> blockCoords = getVerteciesOfAFace(std::get<0>(coordinates), std::get<1>(coordinates), std::get<2>(coordinates), halfDim, xoffset, zoffset, dir, itr -> second);
+                
+                // std::vector<float> test {0.0f, 0.0f, 0.0f};
+                // if(blockCoords == test)
+                //     std::cout << counter <<std::endl;
+                
+                vertecies.insert(vertecies.end(), blockCoords.begin(), blockCoords.end());
+
+                // work on indeces
+                std::vector<unsigned int> blockInds = getIndecesOfAFace(counter);
+                indeces.insert(indeces.end(), blockInds.begin(), blockInds.end());
+                counter++;
 
             }
         }
     }
 
-    return vertecies;
+    return {vertecies, indeces, counter};
+}
+
+
+PieceOfWorld::PieceOfWorld() {
+
+}
+
+PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, module::Turbulence& finalTerrain) : pos{_pos} {
+
+    // OFFEST ON THE RENDERING
+    xoffset = pos.first * nBlockSide * Block::DIMBLOCK;
+    zoffset = pos.second * nBlockSide * Block::DIMBLOCK;
+
+    halfDim = (float)(Block::DIMBLOCK / 2);
+    
+    int xBlockoffset = pos.first * nBlockSide;
+    int zBlockoffset = pos.second * nBlockSide;
+
+    futTerrain = std::async(std::launch::async, genTerrain, xBlockoffset, zBlockoffset, std::ref(finalTerrain));
+    
+    //va = std::shared_ptr<VertexArray>{ new VertexArray{} };
+    va = std::shared_ptr<VertexArray>{ nullptr };
+    vb = std::shared_ptr<VertexBuffer>{ new VertexBuffer{} };
+    eb = std::shared_ptr<ElementBuffer>{ new ElementBuffer{nullptr, 0} };
+    
+    layout = std::shared_ptr<VertexBufferLayout> { new VertexBufferLayout{} };
+    layout -> push<float>(3);
+    layout -> push<float>(2);
+    
+    generatingBuffer = false;
+    firstGeneration = false;
+    //updateBuffers();
+}
+
+void PieceOfWorld::bindBuffers() {
+
+    vb -> updateData(&(vaData[0]), (vertexCounter * 4) * 5 * sizeof(float));
+    va -> bindVb(*vb, *layout);
+
+    // update also the idex buffer in the future (when I will render more than one cube)
+    // SIX indeces for each face
+    eb -> updateData(&(ebData[0]), vertexCounter * 6);
+
 }
 
 bool PieceOfWorld::isBlock(unsigned int x, unsigned int y, unsigned int z) {
@@ -283,41 +229,96 @@ bool PieceOfWorld::isBlock(unsigned int x, unsigned int y, unsigned int z) {
 void PieceOfWorld::breakBlock(unsigned int x, unsigned int y, unsigned int z) {
     //std::cout << "Blocco da rimuovere: " << x << " " << y << " " << z << std::endl;
     blocks.erase({x, y, z});
-    updateBuffers();
+    //updateBuffers();
+
+    if(!generatingBuffer) {
+        futBuffers = std::async(std::launch::async, genBuffers, &blocks, halfDim, xoffset, zoffset);
+        generatingBuffer = true;
+    }
 }
 
 void PieceOfWorld::addBlock(unsigned int x, unsigned int y, unsigned int z, TypeOfBlock type) {
     //std::cout << "Blocco da aggiungere : " << x << " " << y << " " << z << std::endl;
     blocks[{x, y, z}] = type;
-    updateBuffers();
+    //updateBuffers();
+
+    if(!generatingBuffer) {
+        futBuffers = std::async(std::launch::async, genBuffers, &blocks, halfDim, xoffset, zoffset);
+        generatingBuffer = true;
+    }
 }
 
 std::shared_ptr<VertexArray> PieceOfWorld::getVertexArray() {
 
-    if(va == nullptr) {
-        va = std::shared_ptr<VertexArray>{ new VertexArray{} };
-        blocks = fut.get();
-        std::cout << "start update " <<std::endl;
-        updateBuffers();
+    // if(va == nullptr) {
+    //     va = std::shared_ptr<VertexArray>{ new VertexArray{} };
+    //     blocks = fut.get();
+    //     //std::cout << "start update " <<std::endl;
+    //     updateBuffers();
+    // }
+
+    if(!futTerrain.valid() || isReady(futTerrain)) {
+
+        if(!firstGeneration) {
+            blocks = futTerrain.get();
+            futBuffers = std::async(std::launch::async, genBuffers, &blocks, halfDim, xoffset, zoffset);
+            generatingBuffer = true;
+            firstGeneration = true;
+        }
+
+        if(!futBuffers.valid() || isReady(futBuffers)) {
+            if(generatingBuffer) {
+                if(va == nullptr)
+                    va = std::shared_ptr<VertexArray> { new VertexArray{} };
+                generatingBuffer = false;
+                auto buffsData = futBuffers.get();
+                vaData = std::get<0>(buffsData);
+                ebData = std::get<1>(buffsData);
+                vertexCounter = std::get<2>(buffsData);
+                bindBuffers();
+            }
+        }
+        else {
+
+            if(!generatingBuffer) {
+                futBuffers = std::async(std::launch::async, genBuffers, &blocks, halfDim, xoffset, zoffset);
+                generatingBuffer = true;
+            }
+
+        }
+
+        if(va != nullptr)
+            return va;
     }
 
-    return va;
-
+    return { nullptr };
 }
 
 std::shared_ptr<ElementBuffer> PieceOfWorld::getElementBuffer() {
 
-    if(va == nullptr) {
-        va = std::shared_ptr<VertexArray>{ new VertexArray{} };
-        blocks = fut.get();
-        updateBuffers();
+    // if(va == nullptr) {
+    //     va = std::shared_ptr<VertexArray>{ new VertexArray{} };
+    //     blocks = fut.get();
+    //     updateBuffers();
+    // }
+
+    // return eb;
+
+    if(!futTerrain.valid() || isReady(futTerrain)) {
+
+        if(!futBuffers.valid() || isReady(futBuffers)) {
+            // Theorically do not need this, I always call before getVa
+            //bindBuffers();
+            return eb;
+        }
+
     }
 
-    return eb;
+    return { nullptr };
 }
 
 template<typename T>
-bool PieceOfWorld::is_ready(std::future<T> const& f) { 
+bool PieceOfWorld::isReady(std::future<T> const& f) { 
     return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready; 
 }
 
@@ -335,8 +336,5 @@ bool PieceOfWorld::is_ready(std::future<T> const& f) {
  * -1 -1  1 - 7
  *  1 -1  1 - 8
 */
-
-
-
 
 #endif

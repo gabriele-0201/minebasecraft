@@ -6,7 +6,12 @@ enum class TypeOfBlock {
     SOIL,
     SKY,
     SAND,
-    STONE
+    STONE,
+    WATER,
+    FOREST,
+    JUNGLE,
+    DESERT,
+    SNOW
 };
 
 #endif

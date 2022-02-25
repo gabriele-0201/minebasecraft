@@ -5,39 +5,33 @@
 
 World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
 
-    // For now only one piece 
-    //terrain[{0,0}] = PieceOfWorld({0,0});
-    //terrain[{0,1}] = PieceOfWorld({0,1});
-
-    // Create the 9 starting pieces
-    // for(int i = -1; i < 2; ++i) {
-    //     for(int j = -1; j < 2; ++j) {
-    //         terrain[{i,j}] = PieceOfWorld({i,j});
-    //     }
-    // }
-
     currentPos = {0,0};
 
     srand(time(NULL));
 
     baseFlatTerrain.SetFrequency (2.0);
+    baseFlatTerrain.SetSeed(rand() % 100);
 
     flatTerrain.SetSourceModule (0, baseFlatTerrain);
     flatTerrain.SetScale (0.125);
     flatTerrain.SetBias (-0.75);
+    //flatTerrain.SetSeed(rand() % 100);
 
     terrainType.SetFrequency (0.5);
     terrainType.SetPersistence (0.25);
+    terrainType.SetSeed(rand() % 100);
 
     terrainSelector.SetSourceModule (0, flatTerrain);
     terrainSelector.SetSourceModule (1, mountainTerrain);
     terrainSelector.SetControlModule (terrainType);
     terrainSelector.SetBounds (0.0, 1000.0);
     terrainSelector.SetEdgeFalloff (0.125);
+    //terrainSelector.SetSeed(rand() % 100);
 
     finalTerrain.SetSourceModule (0, terrainSelector);
-    finalTerrain.SetFrequency (4.0);
+    finalTerrain.SetFrequency (2.0);
     finalTerrain.SetPower (0.125);
+    finalTerrain.SetSeed(rand() % 100);
     
     std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(0, 0);
     for(auto n: nears) {
@@ -50,7 +44,7 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
 
 std::vector<std::pair<int, int>> World::getNearPieceOfWorld(int x, int z) {
 
-    int renderingPieces = 3;
+    int renderingPieces = 5;
     std::vector<std::pair<int, int>> nears {};
 
     for(int i = x - renderingPieces; i <= x + renderingPieces; ++i) {
@@ -62,48 +56,17 @@ std::vector<std::pair<int, int>> World::getNearPieceOfWorld(int x, int z) {
     return nears;
 }
 
-static std::mutex sArrMutex;
-static void loadVA(std::unordered_map<std::tuple<int, int>, PieceOfWorld, HashTuples::hash2tuple>* terrain, std::vector<std::shared_ptr<VertexArray>>* arr, int x, int z) {
-
-    //std::lock_guard<std::mutex> lock(sArrMutex);
-    sArrMutex.lock();
-    arr -> push_back(terrain -> operator[]({x, z}).getVertexArray());
-    sArrMutex.unlock();
-
-}
-
 std::vector<std::shared_ptr<VertexArray> > World::getAllVertexArrays() {
 
     std::vector<std::shared_ptr<VertexArray>> arrays{};
 
-    // someway reduce the chunks that will be calculed
-
-    std::vector<std::future<void>> futs {};
     std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(currentPos.first, currentPos.second);
     for(auto n: nears) {
-
-        //std::cout << n.first << " " << n.second << std::endl;
-        
-        //arrays.push_back(terrain[{n.first, n.second}].getVertexArray());
-        futs.push_back(std::async(std::launch::async, loadVA, &terrain, &arrays, n.first, n.second));
-        std::cout << "asked for VA" <<std::endl;
-
-
-        //if(terrain.find({n.first, n.second}) != terrain.end())
-            //terrain[n.first, n.second] = PieceOfWorld({n.first, n.second});
-
+        auto v = terrain[{n.first, n.second}].getVertexArray();
+        if(v != nullptr)
+            arrays.push_back(v);
+        // arrays.push_back(terrain[{n.first, n.second}].getVertexArray());
     }
-
-    std::cout << "waiting for finish" <<std::endl;
-
-    for(auto& f: futs)
-        f.get();
-
-    std::cout << "finish" <<std::endl;
-
-    //for(auto itr = terrain.begin(); itr != terrain.end(); ++itr) {
-        //arrays.push_back((itr -> second).getVertexArray());
-    //}
 
     return arrays;
 
@@ -112,22 +75,13 @@ std::vector<std::shared_ptr<VertexArray> > World::getAllVertexArrays() {
 std::vector<std::shared_ptr<ElementBuffer> > World::getAllElementBuffers() {
 
     std::vector<std::shared_ptr<ElementBuffer>> arrays{};
-
-    // someway reduce the chunks that will be calculed
-    //for(auto itr = terrain.begin(); itr != terrain.end(); ++itr) {
-    //    arrays.push_back((itr -> second).getElementBuffer());
-    //}
     
     std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(currentPos.first, currentPos.second);
-    for(auto n: nears) {
-
-
-        arrays.push_back(terrain[{n.first, n.second}].getElementBuffer());
-
-
-        //if(terrain.find({n.first, n.second}) != terrain.end())
-            //terrain[n.first, n.second] = PieceOfWorld({n.first, n.second});
-
+    for(auto n: nears)  {
+        auto e = terrain[{n.first, n.second}].getElementBuffer();
+        if(e != nullptr)
+            arrays.push_back(e);
+        // arrays.push_back(terrain[{n.first, n.second}].getElementBuffer());
     }
 
     return arrays;

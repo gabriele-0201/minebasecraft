@@ -54,34 +54,33 @@ class PieceOfWorld {
 
         float halfDim;
 
-        std::future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>> fut;
+        std::future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>> futTerrain;
+        //bool generatedTerrain;
+        std::future<std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int>> futBuffers;
+        bool generatingBuffer;
+        bool firstGeneration;
 
         // Remember all the block, all the not specified block is
         std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
-        //std::map<std::tuple<int, int, int>, int, HashTuples::hash3tuple> faces;
 
-        // THOSE are stabilized vector, there is not embty space in it
-        std::vector<float> currentVisibleVertecies;
-        std::vector<bool> activeVertecies;
+        std::vector<float> vaData;
+        std::vector<unsigned int> ebData;
+        int vertexCounter;
 
-        std::vector<unsigned int> indeces;
-
-        std::vector<float> getVerteciesOfBlock(unsigned int, unsigned int, unsigned int) const;
-        std::vector<float> getVerteciesOfAFace(unsigned int, unsigned int, unsigned int, glm::vec3 dir, TypeOfBlock type);
-
-        std::vector<unsigned int> getIndecesOfBlock(int counter) const;
-        std::vector<unsigned int> getIndecesOfAFace(int counter) const;
+        //std::vector<float> getVerteciesOfAFace(unsigned int, unsigned int, unsigned int, glm::vec3 dir, TypeOfBlock type);
+        //std::vector<unsigned int> getIndecesOfAFace(int counter) const;
 
         std::shared_ptr<VertexArray> va;
         std::shared_ptr<VertexBuffer> vb;
         std::shared_ptr<VertexBufferLayout> layout;
         std::shared_ptr<ElementBuffer> eb;
 
-        void updateBuffers();
-        int noise(int x, int y, noise::module::Perlin& noise);
+        //void updateBuffers();
+
+        void bindBuffers();
 
         template<class T>
-        bool is_ready(std::future<T> const& f);
+        bool isReady(std::future<T> const& f);
 
     public:
 

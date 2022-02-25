@@ -17,7 +17,7 @@ Renderer::Renderer(World& _w, Player& _p) :
     shader -> bind();
     shader -> setUniform1i("texId", 0);
 
-    distanceOfView = 1000.0f;
+    distanceOfView = 3000.0f;
     proj = glm::perspective(glm::radians(p.fov), 1200.0f/ 900.0f, 0.1f, distanceOfView);
     shader -> setUniform4Matrix("projection", proj);
 
@@ -42,9 +42,9 @@ void Renderer::draw() {
 
     for(int i = 0; i < vas.size(); ++i) {
 
-        std::cout << "try to bind ";
+        //std::cout << "try to bind ";
         vas[i] -> bind();
-        std::cout << "heres the errrro";
+        //std::cout << "heres the errrro";
         ebs[i] -> bind();
 
         GLCall(glDrawElements(GL_TRIANGLES, ebs[i] -> getCount(), GL_UNSIGNED_INT, nullptr));
