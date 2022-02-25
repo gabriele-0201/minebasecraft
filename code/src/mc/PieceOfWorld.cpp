@@ -5,7 +5,7 @@
 
 using namespace std::chrono_literals;
 
-std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> genTerrain(int xBlockOffest, int zBockOffset, module::Turbulence& finalTerrain) {
+std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> genTerrain(int xBlockOffest, int zBockOffset, noise::module::Perlin& finalTerrain) {
 
     std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
 
@@ -35,7 +35,7 @@ std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tupl
             }
 
             if(blocks[{x, heightCol - 1, z}] == TypeOfBlock::STONE || blocks[{x, heightCol - 1, z}] == TypeOfBlock::SOIL)
-                blocks[{x, heightCol - 1, z}] == TypeOfBlock::GRASS;
+                blocks[{x, heightCol - 1, z}] = TypeOfBlock::GRASS;
 
         }
     }
@@ -184,7 +184,7 @@ PieceOfWorld::PieceOfWorld() {
 
 }
 
-PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, module::Turbulence& finalTerrain) : pos{_pos} {
+PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, noise::module::Perlin& finalTerrain) : pos{_pos} {
 
     // OFFEST ON THE RENDERING
     xoffset = pos.first * nBlockSide * Block::DIMBLOCK;

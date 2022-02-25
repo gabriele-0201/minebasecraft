@@ -9,6 +9,7 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
 
     srand(time(NULL));
 
+    /*
     baseFlatTerrain.SetFrequency (2.0);
     baseFlatTerrain.SetSeed(rand() % 100);
 
@@ -32,19 +33,25 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
     finalTerrain.SetFrequency (2.0);
     finalTerrain.SetPower (0.125);
     finalTerrain.SetSeed(rand() % 100);
+    */
+
+    perl.SetSeed(rand() % 100);
+    perl.SetOctaveCount (10);
+    perl.SetFrequency (2.0);
+    perl.SetPersistence (0.5); 
     
     std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(0, 0);
     for(auto n: nears) {
         //std::cout << n.first << " " << n.second << std::endl;
 
-        terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, finalTerrain);
+        terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, perl);
     }
 
 }
 
 std::vector<std::pair<int, int>> World::getNearPieceOfWorld(int x, int z) {
 
-    int renderingPieces = 5;
+    int renderingPieces = 10;
     std::vector<std::pair<int, int>> nears {};
 
     for(int i = x - renderingPieces; i <= x + renderingPieces; ++i) {
@@ -99,7 +106,7 @@ void World::updatePos(int x, int z) {
 
         if(terrain.find({n.first, n.second}) == terrain.end()){
 
-            terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, finalTerrain);
+            terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, perl);
             //std::cout << "New Piece: " << n.first << " " << n.second <<std::endl;
         }
 

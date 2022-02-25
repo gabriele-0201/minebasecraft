@@ -36,6 +36,7 @@ class World {
         module::Perlin terrainType;
         module::Select terrainSelector;
         module::Turbulence finalTerrain;
+        noise::module::Perlin perl;
 
     public:
 

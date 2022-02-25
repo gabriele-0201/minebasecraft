@@ -86,7 +86,7 @@ class PieceOfWorld {
 
         // Some way to get NOISE
         PieceOfWorld();
-        PieceOfWorld(std::pair<int, int>, module::Turbulence& finalTerrain);
+        PieceOfWorld(std::pair<int, int>, noise::module::Perlin& finalTerrain);
 
         //std::vector<float> getVertecies() const;
         //std::vector<unsigned int> getIndecies() const;
