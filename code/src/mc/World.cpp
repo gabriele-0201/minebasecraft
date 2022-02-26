@@ -44,14 +44,14 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
     for(auto n: nears) {
         //std::cout << n.first << " " << n.second << std::endl;
 
-        terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, perl);
+        terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, perl, &terrainBlocks);
     }
 
 }
 
 std::vector<std::pair<int, int>> World::getNearPieceOfWorld(int x, int z) {
 
-    int renderingPieces = 10;
+    int renderingPieces = 0;
     std::vector<std::pair<int, int>> nears {};
 
     for(int i = x - renderingPieces; i <= x + renderingPieces; ++i) {
@@ -106,7 +106,7 @@ void World::updatePos(int x, int z) {
 
         if(terrain.find({n.first, n.second}) == terrain.end()){
 
-            terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, perl);
+            terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, perl, &terrainBlocks);
             //std::cout << "New Piece: " << n.first << " " << n.second <<std::endl;
         }
 

@@ -2,6 +2,7 @@
 #define WORLD_H
 
 #include <unordered_map>
+#include <unordered_set>
 #include <memory>
 #include <libnoise/noise.h>
 #include <time.h>
@@ -26,6 +27,7 @@ class World {
 
         // Someway store chunkssss
         std::unordered_map<std::tuple<int, int>, PieceOfWorld, HashTuples::hash2tuple> terrain;
+        std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple> terrainBlocks;
 
         std::vector<std::pair<int, int>> getNearPieceOfWorld(int x, int z);
         std::pair<int, int> currentPos;

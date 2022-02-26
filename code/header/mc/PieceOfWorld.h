@@ -2,6 +2,7 @@
 #define PIECEOFWORLD_H
 
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include <memory>
 #include <libnoise/noise.h>
@@ -63,6 +64,8 @@ class PieceOfWorld {
         // Remember all the block, all the not specified block is
         std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
 
+        std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks;
+
         std::vector<float> vaData;
         std::vector<unsigned int> ebData;
         int vertexCounter;
@@ -86,7 +89,7 @@ class PieceOfWorld {
 
         // Some way to get NOISE
         PieceOfWorld();
-        PieceOfWorld(std::pair<int, int>, noise::module::Perlin& finalTerrain);
+        PieceOfWorld(std::pair<int, int>, noise::module::Perlin& finalTerrain, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* _terrainBlocks);
 
         //std::vector<float> getVertecies() const;
         //std::vector<unsigned int> getIndecies() const;
