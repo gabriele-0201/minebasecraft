@@ -52,6 +52,8 @@ class PieceOfWorld {
         std::pair<int, int> pos;
         float xoffset;
         float zoffset;
+        int xBlockOffset;
+        int zBlockOffset;
 
         float halfDim;
 

@@ -51,7 +51,7 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
 
 std::vector<std::pair<int, int>> World::getNearPieceOfWorld(int x, int z) {
 
-    int renderingPieces = 0;
+    int renderingPieces = 5;
     std::vector<std::pair<int, int>> nears {};
 
     for(int i = x - renderingPieces; i <= x + renderingPieces; ++i) {
