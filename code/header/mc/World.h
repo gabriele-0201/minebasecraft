@@ -43,6 +43,8 @@ class World {
         int renderingBlockDistance = 15;
         int viewBlockDistance = 15;
 
+        glm::vec3 cameraPos;
+
     public:
 
         World(GLFWwindow* win, unsigned int seed);
@@ -59,7 +61,7 @@ class World {
         //std::vector<std::vector<unsigned int>> getAllIndicies();
 
         // This will update also the chunks that will be rendered each frame
-        void updatePos(int x, int z);
+        void updatePos(int x, int z, glm::vec3 cameraPos);
 
         /**
          * Check if in a determinate position there is a block or not

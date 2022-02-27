@@ -41,7 +41,7 @@ void Player::processKeyInput(GLFWwindow* window) {
     std::pair<glm::vec2, glm::vec3> newPosition = getBlockPos(cameraPos);
     if(!isEqual(newPosition, currentPos)) {
         copy(currentPos, newPosition);
-        w.updatePos(currentPos.first.x, currentPos.first.y);
+        w.updatePos(currentPos.first.x, currentPos.first.y, cameraPos);
     }
     
 }

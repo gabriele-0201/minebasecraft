@@ -5,8 +5,8 @@
 
 World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
 
-    renderingBlockDistance = 3;
-    viewBlockDistance = 1;
+    renderingBlockDistance = 15;
+    viewBlockDistance = 10;
     currentPos = {0,0};
 
     srand(time(NULL));
@@ -101,7 +101,9 @@ std::vector<std::shared_ptr<ElementBuffer> > World::getAllElementBuffers() {
 }
 
 // This will update also the chunks that will be rendered each frame
-void World::updatePos(int x, int z) {
+void World::updatePos(int x, int z, glm::vec3 _cameraPos) {
+
+    cameraPos = _cameraPos;
 
     currentPos.first = x;
     currentPos.second = z;

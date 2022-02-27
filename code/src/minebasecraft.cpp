@@ -21,7 +21,6 @@ void mouseButtonCbGeneral(GLFWwindow* window, int button, int action, int mods) 
 void winSizeCbGeneral(GLFWwindow* window, int width, int height) {
     ASSERT(r);
     r -> winSizeCb(width, height);
-
 }
 
 void keyCb(GLFWwindow* window, int key, int scancode, int action, int mods) {

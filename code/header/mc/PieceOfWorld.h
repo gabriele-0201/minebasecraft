@@ -81,6 +81,7 @@ class PieceOfWorld {
         std::shared_ptr<ElementBuffer> eb;
 
         //void updateBuffers();
+        glm::vec3 cameraPos;
 
         void bindBuffers();
 

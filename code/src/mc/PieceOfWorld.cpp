@@ -31,7 +31,7 @@ std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tupl
                 else blocks[{x, y, z}] = TypeOfBlock::SNOW;
 
                 std::lock_guard<std::mutex> locker(_lock);
-                terrainBlocks -> insert({xWorld, y, zWorld});
+                //terrainBlocks -> insert({xWorld, y, zWorld});
 
             }
 
@@ -179,25 +179,34 @@ std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int> genBuffe
                 if(checkValue != blocks -> end())
                     continue;
                     */
-
+                //std::cout << " non sembra funzionare per un cazzo" <<std::endl;
                 // RESUME
                 // IF the near is outside of the chunk
-                if(std::get<0>(coordinates) + dir.x < 0 || std::get<0>(coordinates) + dir.x >= nBlockSide ||
-                    std::get<1>(coordinates) + dir.y < 0 ||
-                    std::get<2>(coordinates) + dir.z < 0 || std::get<2>(coordinates) + dir.z >= nBlockSide) {
+                // if(std::get<0>(coordinates) + dir.x < 0 || std::get<0>(coordinates) + dir.x >= nBlockSide ||
+                //     std::get<1>(coordinates) + dir.y < 0 ||
+                //     std::get<2>(coordinates) + dir.z < 0 || std::get<2>(coordinates) + dir.z >= nBlockSide) {
 
-                    std::lock_guard<std::mutex> locker(_lock);
-                    auto checkValue = terrainBlocks -> find({xBlockOffset + std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, zBlockOffset + std::get<2>(coordinates) + dir.z});
-                    if(checkValue != terrainBlocks -> end() /* && checkValue -> second != TypeOfBlock::SKY*/)
-                        continue;
+                //     //std::cout << "esco dal bound" <<std::endl;
 
-                } else {
+                //     if(xBlockOffset == 16 && zBlockOffset == 16) {
+                //         std::cout << xBlockOffset + std::get<0>(coordinates) + dir.x <<std::endl;
+                //         std::cout << zBlockOffset + std::get<0>(coordinates) + dir.z <<std::endl;
+                //     }
+
+                //     std::lock_guard<std::mutex> locker(_lock);
+                //     auto checkValue = terrainBlocks -> find({xBlockOffset + std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, zBlockOffset + std::get<2>(coordinates) + dir.z});
+                //     if(checkValue != terrainBlocks -> end() /* && checkValue -> second != TypeOfBlock::SKY*/)
+                //         continue;
+
+                // } else {
+
+                    //std::cout << "sono dentro il bond non capisco che succede" <<std::endl;
 
                     auto checkValue = blocks -> find({std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, std::get<2>(coordinates) + dir.z});
                     if(checkValue != blocks -> end())
                         continue;
 
-                }
+                // }
 
                 //std::cout << std::get<0>(coordinates) << " " << std::get<1>(coordinates) << " " << std::get<2>(coordinates) << " " << std::endl;
                 //std::cout << dir.x << " " << dir.y << " " << dir.z << " " << std::endl;
