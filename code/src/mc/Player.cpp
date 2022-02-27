@@ -121,7 +121,7 @@ std::pair<glm::vec2, glm::vec3> Player::getBlockPos(glm::vec3 pos) {
     int sizeSide = nBlockSide * Block::DIMBLOCK;
     blockPos.first.x = floor(pos.x / sizeSide);
     blockPos.first.y = floor(pos.z / sizeSide);
-    blockPos.second.x = (int)floor(pos.x) % nBlockSide;
+    blockPos.second.x = (int)floor(pos.x) % sizeSide;
     blockPos.second.z = (int)floor(pos.z) % sizeSide;
     blockPos.second.y = (int)floor(pos.y);
 
