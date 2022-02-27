@@ -109,7 +109,7 @@ std::vector<unsigned int> getIndecesOfAFace(unsigned int counter) {
 }
 
 
-bool haveToBeDraw(std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks,unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, float halfDim, int xBlockOffset, int zBlockOffset, glm::vec3 dir) { 
+bool haveToBeDraw(std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks,unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, int xBlockOffset, int zBlockOffset, glm::vec3 dir) { 
 
     std::lock_guard<std::mutex> locker(_lock);
     return ((terrainBlocks -> find({(xBlock + xBlockOffset) + dir.x, yBlock  + dir.y, (zBlock + zBlockOffset) + dir.z})) == terrainBlocks -> end());
@@ -154,12 +154,25 @@ std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int> genBuffe
 
                 // Check out of bounds: (n=only for now)
 
+                /*
                 if((std::get<0>(coordinates) + dir.x < 0 || std::get<0>(coordinates) + dir.x >= nBlockSide ||
                     std::get<1>(coordinates) + dir.y < 0 ||
-                    std::get<2>(coordinates) + dir.z < 0 || std::get<2>(coordinates) + dir.z >= nBlockSide) &&
-                    !haveToBeDraw(terrainBlocks, std::get<0>(coordinates), std::get<1>(coordinates), std::get<2>(coordinates), halfDim, xBlockOffset, zBlockOffset, dir)
-                    ) continue;
+                    std::get<2>(coordinates) + dir.z < 0 || std::get<2>(coordinates) + dir.z >= nBlockSide)) {
 
+                    //std::cout << "Sees: " <<std::endl;
+
+                    //if(!haveToBeDraw(terrainBlocks, std::get<0>(coordinates), std::get<1>(coordinates), std::get<2>(coordinates), xBlockOffset, zBlockOffset, dir))
+
+                    // if exist a block in that direction tha face has to be drawn
+
+                    //if((terrainBlocks -> find({(std::get<0>(coordinates) + xBlockOffset) + dir.x, std::get<1>(coordinates)  + dir.y, (std::get<2>(coordinates) + zBlockOffset) + dir.z})) != terrainBlocks -> end());
+                        //continue;
+                    
+                    std::cout << "this face should not be rendered " << std::get<0>(coordinates) + xBlockOffset << " " << std::get<1>(coordinates) << " " << std::get<2>(coordinates) + zBlockOffset << std::endl;
+                    std::cout << "in this direction: " << dir.x << " " << dir.y << " " << dir.z <<std::endl;
+                }
+                */
+                
                 auto checkValue = blocks -> find({std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, std::get<2>(coordinates) + dir.z});
                 // THIS solution is only for now, because I'm rendering all the freaking faces beteween chunks
                 // RENDER also the side of the the face to other chunks
