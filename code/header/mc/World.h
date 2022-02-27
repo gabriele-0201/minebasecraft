@@ -29,7 +29,7 @@ class World {
         std::unordered_map<std::tuple<int, int>, PieceOfWorld, HashTuples::hash2tuple> terrain;
         std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple> terrainBlocks;
 
-        std::vector<std::pair<int, int>> getNearPieceOfWorld(int x, int z);
+        std::vector<std::pair<int, int>> getNearPieceOfWorld(int x, int z, int distance);
         std::pair<int, int> currentPos;
 
         module::RidgedMulti mountainTerrain;
@@ -39,6 +39,9 @@ class World {
         module::Select terrainSelector;
         module::Turbulence finalTerrain;
         noise::module::Perlin perl;
+
+        int renderingBlockDistance = 15;
+        int viewBlockDistance = 15;
 
     public:
 

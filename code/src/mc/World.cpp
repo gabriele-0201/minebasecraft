@@ -5,6 +5,8 @@
 
 World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
 
+    renderingBlockDistance = 3;
+    viewBlockDistance = 1;
     currentPos = {0,0};
 
     srand(time(NULL));
@@ -40,7 +42,7 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
     perl.SetFrequency (2.0);
     perl.SetPersistence (0.5); 
     
-    std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(0, 0);
+    std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(0, 0, renderingBlockDistance);
     for(auto n: nears) {
         //std::cout << n.first << " " << n.second << std::endl;
 
@@ -49,13 +51,15 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
 
 }
 
-std::vector<std::pair<int, int>> World::getNearPieceOfWorld(int x, int z) {
+std::vector<std::pair<int, int>> World::getNearPieceOfWorld(int x, int z, int distance) {
 
-    int renderingPieces = 0;
+    //int renderingPieces = 2;
     std::vector<std::pair<int, int>> nears {};
 
-    for(int i = x - renderingPieces; i <= x + renderingPieces; ++i) {
-        for(int j = z - renderingPieces; j <= z + renderingPieces; ++j) {
+    //for(int i = x - renderingPieces; i <= x + renderingPieces; ++i) {
+        //for(int j = z - renderingPieces; j <= z + renderingPieces; ++j) {
+    for(int i = x - distance; i <= x + distance; ++i) {
+        for(int j = z - distance; j <= z + distance; ++j) {
             nears.push_back({i, j});
         }
     }
@@ -67,7 +71,7 @@ std::vector<std::shared_ptr<VertexArray> > World::getAllVertexArrays() {
 
     std::vector<std::shared_ptr<VertexArray>> arrays{};
 
-    std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(currentPos.first, currentPos.second);
+    std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(currentPos.first, currentPos.second, viewBlockDistance);
     for(auto n: nears) {
         auto v = terrain[{n.first, n.second}].getVertexArray();
         if(v != nullptr)
@@ -83,7 +87,8 @@ std::vector<std::shared_ptr<ElementBuffer> > World::getAllElementBuffers() {
 
     std::vector<std::shared_ptr<ElementBuffer>> arrays{};
     
-    std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(currentPos.first, currentPos.second);
+    // See chunk
+    std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(currentPos.first, currentPos.second, viewBlockDistance);
     for(auto n: nears)  {
         auto e = terrain[{n.first, n.second}].getElementBuffer();
         if(e != nullptr)
@@ -101,7 +106,8 @@ void World::updatePos(int x, int z) {
     currentPos.first = x;
     currentPos.second = z;
     
-    std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(currentPos.first, currentPos.second);
+    // neatest for rendering
+    std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(currentPos.first, currentPos.second, renderingBlockDistance);
     for(auto n: nears) {
 
         if(terrain.find({n.first, n.second}) == terrain.end()){

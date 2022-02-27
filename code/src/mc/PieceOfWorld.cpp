@@ -108,14 +108,6 @@ std::vector<unsigned int> getIndecesOfAFace(unsigned int counter) {
     return data;
 }
 
-
-bool haveToBeDraw(std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks,unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, int xBlockOffset, int zBlockOffset, glm::vec3 dir) { 
-
-    std::lock_guard<std::mutex> locker(_lock);
-    return ((terrainBlocks -> find({(xBlock + xBlockOffset) + dir.x, yBlock  + dir.y, (zBlock + zBlockOffset) + dir.z})) == terrainBlocks -> end());
-
-}
-
 std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int> genBuffers(std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks, float halfDim, float xoffset, float zoffset, int xBlockOffset, int zBlockOffset) {
 
     std::vector<float> vertecies{};
@@ -172,21 +164,45 @@ std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int> genBuffe
                     std::cout << "in this direction: " << dir.x << " " << dir.y << " " << dir.z <<std::endl;
                 }
                 */
-                
+
+                // CHECK IN THE BIG MAP
+                //auto checkValue = terrainBlocks -> find({xBlockOffset + std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, zBlockOffset + std::get<2>(coordinates) + dir.z});
+                // THIS solution is only for now, because I'm rendering all the freaking faces beteween chunks
+                // RENDER also the side of the the face to other chunks
+                //if(checkValue != terrainBlocks -> end() /* && checkValue -> second != TypeOfBlock::SKY*/)
+                //    continue;
+
+                /*
                 auto checkValue = blocks -> find({std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, std::get<2>(coordinates) + dir.z});
                 // THIS solution is only for now, because I'm rendering all the freaking faces beteween chunks
                 // RENDER also the side of the the face to other chunks
-                if(checkValue != blocks -> end() /* && checkValue -> second != TypeOfBlock::SKY*/)
+                if(checkValue != blocks -> end())
                     continue;
+                    */
+
+                // RESUME
+                // IF the near is outside of the chunk
+                if(std::get<0>(coordinates) + dir.x < 0 || std::get<0>(coordinates) + dir.x >= nBlockSide ||
+                    std::get<1>(coordinates) + dir.y < 0 ||
+                    std::get<2>(coordinates) + dir.z < 0 || std::get<2>(coordinates) + dir.z >= nBlockSide) {
+
+                    std::lock_guard<std::mutex> locker(_lock);
+                    auto checkValue = terrainBlocks -> find({xBlockOffset + std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, zBlockOffset + std::get<2>(coordinates) + dir.z});
+                    if(checkValue != terrainBlocks -> end() /* && checkValue -> second != TypeOfBlock::SKY*/)
+                        continue;
+
+                } else {
+
+                    auto checkValue = blocks -> find({std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, std::get<2>(coordinates) + dir.z});
+                    if(checkValue != blocks -> end())
+                        continue;
+
+                }
 
                 //std::cout << std::get<0>(coordinates) << " " << std::get<1>(coordinates) << " " << std::get<2>(coordinates) << " " << std::endl;
                 //std::cout << dir.x << " " << dir.y << " " << dir.z << " " << std::endl;
 
                 std::vector<float> blockCoords = getVerteciesOfAFace(std::get<0>(coordinates), std::get<1>(coordinates), std::get<2>(coordinates), halfDim, xoffset, zoffset, dir, itr -> second);
-                
-                // std::vector<float> test {0.0f, 0.0f, 0.0f};
-                // if(blockCoords == test)
-                //     std::cout << counter <<std::endl;
                 
                 vertecies.insert(vertecies.end(), blockCoords.begin(), blockCoords.end());
 
