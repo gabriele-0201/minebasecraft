@@ -78,10 +78,10 @@ bool faceToDraw(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, f
     if(z < 0)
         z += nBlockSide;
 
-    std::cout << "Blocchi: " << std::endl;
-    std::cout << "XBlock: " << xBlock << " YBlock: " << yBlock << " ZBlock: " << zBlock <<std::endl;
-    std::cout << "Dir: " << dir.x << " " << dir.y << " " << dir.z << std::endl;
-    std::cout << "x: " << x << " y: " << y << " z: " << z <<std::endl;
+    //std::cout << "Blocchi: " << std::endl;
+    //std::cout << "XBlock: " << xBlock << " YBlock: " << yBlock << " ZBlock: " << zBlock <<std::endl;
+    //std::cout << "Dir: " << dir.x << " " << dir.y << " " << dir.z << std::endl;
+    //std::cout << "x: " << x << " y: " << y << " z: " << z <<std::endl;
 
     if(x == xBlock && y == yBlock && z == zBlock) {
         std::cout << " fuck lui non lo disegna" <<std::endl;
@@ -153,16 +153,13 @@ std::vector<unsigned int> getIndecesOfAFace(unsigned int counter) {
     return data;
 }
 
-std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int> genBuffers(std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks, float halfDim, float xoffset, float zoffset, int xBlockOffset, int zBlockOffset, glm::vec3 cameraPos, std::future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>>* futTerrain) {
-
-    std::cout << " sono entrato da qui" <<std::endl;
+std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int> genBuffers(std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks, float halfDim, float xoffset, float zoffset, int xBlockOffset, int zBlockOffset, glm::vec3 cameraPos, std::shared_future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>> futTerrain) {
 
     //_lock.lock();
-    if(futTerrain != nullptr)
-        *blocks = futTerrain -> get();
+    //if(futTerrain != nullptr)
+    if(futTerrain.valid())
+        *blocks = futTerrain.get();
     //_lock.unlock();
-
-    std::cout << " sono uscito da qui" <<std::endl;
 
     std::vector<float> vertecies{};
     std::vector<unsigned int> indeces{};
@@ -334,7 +331,7 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, noise::module::Perlin& fina
     firstGeneration = false;
     //updateBuffers();
     
-    futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, &futTerrain);
+    futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain);
 }
 
 void PieceOfWorld::bindBuffers() {
@@ -364,7 +361,7 @@ void PieceOfWorld::breakBlock(unsigned int x, unsigned int y, unsigned int z) {
     }
     */
     if(!futBuffers.valid()) {
-        futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, nullptr);
+        futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain);
     }
 }
 
@@ -380,7 +377,7 @@ void PieceOfWorld::addBlock(unsigned int x, unsigned int y, unsigned int z, Type
     }
     */
     if(!futBuffers.valid()) {
-        futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, nullptr);
+        futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain);
     }
 }
 
@@ -493,6 +490,11 @@ std::shared_ptr<ElementBuffer> PieceOfWorld::getElementBuffer() {
 
 template<typename T>
 bool PieceOfWorld::isReady(std::future<T> const& f) { 
+    return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready; 
+}
+
+template<typename T>
+bool PieceOfWorld::isReady(std::shared_future<T> const& f) { 
     return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready; 
 }
 

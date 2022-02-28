@@ -57,7 +57,7 @@ class PieceOfWorld {
 
         float halfDim;
 
-        std::future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>> futTerrain;
+        std::shared_future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>> futTerrain;
         //bool generatedTerrain;
         std::future<std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int>> futBuffers;
         bool generatingBuffer;
@@ -88,6 +88,8 @@ class PieceOfWorld {
         template<class T>
         bool isReady(std::future<T> const& f);
 
+        template<class T>
+        bool isReady(std::shared_future<T> const& f);
     public:
 
         // Some way to get NOISE
