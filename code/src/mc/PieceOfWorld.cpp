@@ -6,6 +6,7 @@
 using namespace std::chrono_literals;
 
 static std::mutex _lock;
+static std::shared_mutex _lockShared;
 
 //std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> genTerrain( std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks,int xBlockOffest, int zBockOffset, noise::module::Perlin& finalTerrain) {
 void genTerrain(std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks,int xBlockOffest, int zBockOffset, noise::module::Perlin& finalTerrain) {
@@ -24,7 +25,7 @@ void genTerrain(std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashT
 
             int heightCol = (finalTerrain.GetValue(xWorld * 0.001, zWorld * 0.001, 0.0f) + 1) * (256.0f / 2.0f);
 
-            std::lock_guard<std::mutex> locker(_lock);
+            std::lock_guard<std::shared_mutex> locker(_lockShared);
 
             for(int y = 0; y < heightCol; ++y) {
 

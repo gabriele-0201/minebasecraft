@@ -7,6 +7,7 @@
 #include <memory>
 #include <libnoise/noise.h>
 #include <future>
+#include <shared_mutex>
 #include <chrono>
 
 #include "noiseutils.h"
