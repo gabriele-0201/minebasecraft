@@ -63,15 +63,14 @@ bool faceToDraw(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, f
         centerFace = glm::vec3 (xoffset + xCenter, yCenter, zoffset + zCenter + (float)(halfDim * dir.z));
 
     // maybe opposite
-    //glm::vec3 direction = centerFace - cameraPos;
     glm::vec3 direction = cameraPos - centerFace;
 
-    glm::vec3 pointToCheck = centerFace + (direction * 0.01f);
+    glm::vec3 pointToCheck = centerFace + (direction * 0.2f);
 
     int sizeSide = nBlockSide * Block::DIMBLOCK;
     int x = (int)floor(pointToCheck.x) % sizeSide;
-    int z = (int)floor(pointToCheck.z) % sizeSide;
     int y = (int)floor(pointToCheck.y);
+    int z = (int)floor(pointToCheck.z) % sizeSide;
 
     // TEST
     if(x < 0)
@@ -79,8 +78,13 @@ bool faceToDraw(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, f
     if(z < 0)
         z += nBlockSide;
 
+    std::cout << "Blocchi: " << std::endl;
+    std::cout << "XBlock: " << xBlock << " YBlock: " << yBlock << " ZBlock: " << zBlock <<std::endl;
+    std::cout << "Dir: " << dir.x << " " << dir.y << " " << dir.z << std::endl;
+    std::cout << "x: " << x << " y: " << y << " z: " << z <<std::endl;
+
     if(x == xBlock && y == yBlock && z == zBlock) {
-        std::cout << " fuck " <<std::endl;
+        std::cout << " fuck lui non lo disegna" <<std::endl;
         return false;
     }
 
@@ -149,11 +153,21 @@ std::vector<unsigned int> getIndecesOfAFace(unsigned int counter) {
     return data;
 }
 
-std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int> genBuffers(std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks, float halfDim, float xoffset, float zoffset, int xBlockOffset, int zBlockOffset, glm::vec3 cameraPos) {
+std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int> genBuffers(std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks, float halfDim, float xoffset, float zoffset, int xBlockOffset, int zBlockOffset, glm::vec3 cameraPos, std::future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>>* futTerrain) {
+
+    std::cout << " sono entrato da qui" <<std::endl;
+
+    //_lock.lock();
+    if(futTerrain != nullptr)
+        *blocks = futTerrain -> get();
+    //_lock.unlock();
+
+    std::cout << " sono uscito da qui" <<std::endl;
 
     std::vector<float> vertecies{};
     std::vector<unsigned int> indeces{};
     unsigned int counter = 0;
+
 
     for(auto itr = blocks -> begin(); itr != blocks -> end(); ++itr) {
 
@@ -187,6 +201,10 @@ std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int> genBuffe
 
                 // Check out of bounds: (n=only for now)
 
+                // USEFULL if I draw the vertex only once
+                // if(!faceToDraw(std::get<0>(coordinates), std::get<1>(coordinates), std::get<2>(coordinates), xoffset, zoffset, halfDim, dir, cameraPos))
+                //     continue;
+
                 if((std::get<0>(coordinates) + dir.x < 0 || std::get<0>(coordinates) + dir.x >= nBlockSide ||
                     std::get<1>(coordinates) + dir.y < 0 ||
                     std::get<2>(coordinates) + dir.z < 0 || std::get<2>(coordinates) + dir.z >= nBlockSide)) {
@@ -207,11 +225,6 @@ std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int> genBuffe
                         continue;
 
                 }
-
-                if(!faceToDraw(std::get<0>(coordinates), std::get<1>(coordinates), std::get<2>(coordinates), xoffset, zoffset, halfDim, dir, cameraPos));
-                    continue;
-
-                std::cout << "NOTHING WORKS" <<std::endl;
 
                 /*
                     //std::cout << "Sees: " <<std::endl;
@@ -287,7 +300,6 @@ std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int> genBuffe
         }
     }
 
-    std::cout << "dovrebbe avere finito" << std::endl;
     return {vertecies, indeces, counter};
 }
 
@@ -321,6 +333,8 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, noise::module::Perlin& fina
     generatingBuffer = false;
     firstGeneration = false;
     //updateBuffers();
+    
+    futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, &futTerrain);
 }
 
 void PieceOfWorld::bindBuffers() {
@@ -350,7 +364,7 @@ void PieceOfWorld::breakBlock(unsigned int x, unsigned int y, unsigned int z) {
     }
     */
     if(!futBuffers.valid()) {
-        futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos);
+        futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, nullptr);
     }
 }
 
@@ -366,7 +380,7 @@ void PieceOfWorld::addBlock(unsigned int x, unsigned int y, unsigned int z, Type
     }
     */
     if(!futBuffers.valid()) {
-        futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos);
+        futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, nullptr);
     }
 }
 
@@ -383,13 +397,13 @@ std::shared_ptr<VertexArray> PieceOfWorld::getVertexArray() {
     if(!futTerrain.valid() || isReady(futTerrain)) {
     
         // Just finisched generatin the terrain
-        if(va == nullptr && !futBuffers.valid()) {
+        // if(va == nullptr && !futBuffers.valid()) {
 
-            blocks = futTerrain.get();
-            futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos);
-            generatingBuffer = true;
+        //     blocks = futTerrain.get();
+        //     futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos);
+        //     generatingBuffer = true;
 
-        }
+        // }
 
         // the future of the buffers has to be valid and finished
         if(futBuffers.valid() && isReady(futBuffers)) {
