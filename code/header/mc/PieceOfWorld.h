@@ -57,7 +57,8 @@ class PieceOfWorld {
 
         float halfDim;
 
-        std::shared_future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>> futTerrain;
+        //std::shared_future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>> futTerrain;
+        std::shared_future<void> futTerrain;
         //bool generatedTerrain;
         std::future<std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int>> futBuffers;
         bool generatingBuffer;
