@@ -7,7 +7,6 @@
 #include <memory>
 #include <libnoise/noise.h>
 #include <future>
-#include <shared_mutex>
 #include <chrono>
 
 #include "noiseutils.h"
@@ -58,10 +57,10 @@ class PieceOfWorld {
 
         float halfDim;
 
-        //std::shared_future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>> futTerrain;
-        std::shared_future<void> futTerrain;
+        std::shared_future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>> futTerrain;
         //bool generatedTerrain;
-        std::future<std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int>> futBuffers;
+        //std::future<std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int>> futBuffers;
+        std::future<void> futBuffers;
         bool generatingBuffer;
         bool firstGeneration;
 
@@ -72,7 +71,7 @@ class PieceOfWorld {
 
         std::vector<float> vaData;
         std::vector<unsigned int> ebData;
-        int vertexCounter;
+        unsigned int vertexCounter;
 
         //std::vector<float> getVerteciesOfAFace(unsigned int, unsigned int, unsigned int, glm::vec3 dir, TypeOfBlock type);
         //std::vector<unsigned int> getIndecesOfAFace(int counter) const;
