@@ -2,6 +2,7 @@
 #define PIECEOFWORLD_H
 
 #include <unordered_map>
+#include <map>
 #include <unordered_set>
 #include <vector>
 #include <memory>
@@ -57,7 +58,8 @@ class PieceOfWorld {
 
         float halfDim;
 
-        std::shared_future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>> futTerrain;
+        //std::shared_future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>> futTerrain;
+        std::shared_future<void> futTerrain;
         //bool generatedTerrain;
         //std::future<std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int>> futBuffers;
         std::future<void> futBuffers;
@@ -65,7 +67,7 @@ class PieceOfWorld {
         bool firstGeneration;
 
         // Remember all the block, all the not specified block is
-        std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
+        std::map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
 
         std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks;
 

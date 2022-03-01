@@ -7,9 +7,9 @@ using namespace std::chrono_literals;
 
 static std::mutex _lock;
 
-std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> genTerrain( std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks,int xBlockOffest, int zBockOffset, noise::module::Perlin& finalTerrain) {
+void genTerrain (std::map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks,int xBlockOffest, int zBockOffset, noise::module::Perlin& finalTerrain) {
 
-    std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
+    //std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
 
     for(int x = 0; x < nBlockSide; ++x) {
 
@@ -21,28 +21,37 @@ std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tupl
 
             int heightCol = (finalTerrain.GetValue(xWorld * 0.001, zWorld * 0.001, 0.0f) + 1) * (256.0f / 2.0f);
 
+            std::lock_guard<std::mutex> locker(_lock);
+
             for(int y = 0; y < heightCol; ++y) {
 
-                if (y < 70) blocks[{x, y, z}] = TypeOfBlock::STONE;
-                else if (y < 80) blocks[{x, y, z}] = TypeOfBlock::SAND;
-                else if (y < 130) blocks[{x, y, z}] = TypeOfBlock::SOIL;
-                else if (y < 170) blocks[{x, y, z}] = TypeOfBlock::STONE;
-                else blocks[{x, y, z}] = TypeOfBlock::SNOW;
+                // if (y < 70) blocks[{x, y, z}] = TypeOfBlock::STONE;
+                // else if (y < 80) blocks[{x, y, z}] = TypeOfBlock::SAND;
+                // else if (y < 130) blocks[{x, y, z}] = TypeOfBlock::SOIL;
+                // else if (y < 170) blocks[{x, y, z}] = TypeOfBlock::STONE;
+                // else blocks[{x, y, z}] = TypeOfBlock::SNOW;
 
-                std::lock_guard<std::mutex> locker(_lock);
+                if (y < 70) blocks -> insert({{x, y, z}, TypeOfBlock::STONE}); 
+                else if (y < 80) blocks -> insert({{x, y, z}, TypeOfBlock::STONE});
+                else if (y < 130) blocks -> insert({{x, y, z}, TypeOfBlock::SOIL});
+                else if (y < 170) blocks -> insert({{x, y, z}, TypeOfBlock::STONE});
+                else blocks -> insert({{x, y, z}, TypeOfBlock::SNOW});
+
                 terrainBlocks -> insert({xWorld, y, zWorld});
 
             }
 
             for(int y = heightCol; y < 70; ++y)
-                blocks.operator[] ({x, y, z}) = TypeOfBlock::WATER;
+                blocks -> insert({{x, y, z}, TypeOfBlock::SNOW});
+                //blocks.operator[] ({x, y, z}) = TypeOfBlock::WATER;
 
-            if(blocks.find({x, heightCol - 1, z}) -> second == TypeOfBlock::STONE || blocks.find({x, heightCol - 1, z}) -> second == TypeOfBlock::SOIL)
-                blocks.operator[] ({x, heightCol - 1, z}) = TypeOfBlock::GRASS;
+            if(blocks -> find({x, heightCol - 1, z}) -> second == TypeOfBlock::STONE || blocks -> find({x, heightCol - 1, z}) -> second == TypeOfBlock::SOIL)
+                blocks -> insert({{x, heightCol - 1, z}, TypeOfBlock::GRASS});
+                //blocks.operator[] ({x, heightCol - 1, z}) = TypeOfBlock::GRASS;
 
         }
     }
-    return blocks;
+    //return blocks;
 }
 
 bool faceToDraw(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, float xoffset, float zoffset, float halfDim, glm::vec3 dir, glm::vec3 cameraPos) {
@@ -151,20 +160,20 @@ std::vector<unsigned int> getIndecesOfAFace(unsigned int counter) {
     return data;
 }
 
-void genBuffers(std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks, float halfDim, float xoffset, float zoffset, int xBlockOffset, int zBlockOffset, glm::vec3 cameraPos, std::shared_future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>> futTerrain, std::vector<float>* vertecies, std::vector<unsigned int>* indeces, unsigned int* counter) {
+void genBuffers(std::map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks, float halfDim, float xoffset, float zoffset, int xBlockOffset, int zBlockOffset, glm::vec3 cameraPos, std::shared_future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>> futTerrain, std::vector<float>* vertecies, std::vector<unsigned int>* indeces, unsigned int* counter) {
 
-    std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blockss;
+    //std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blockss;
     //_lock.lock();
-    if(blocks == nullptr && futTerrain.valid())
-        blockss = futTerrain.get();
-    //_lock.unlock();
+    if(futTerrain.valid())
+        futTerrain.get();
+    //_lock.unlock()
 
     //std::vector<float> vertecies{};
     //std::vector<unsigned int> indeces{};
-    //unsigned int counter = 0;
+    *counter = 0;
 
     //for(auto itr = blocks -> begin(); itr != blocks -> end(); ++itr) {
-    for(auto itr = blockss.begin(); itr != blockss.end(); ++itr) {
+    for(auto itr = blocks -> begin(); itr != blocks -> end(); ++itr) {
 
         if((itr -> second) == TypeOfBlock::SKY)
             continue;
@@ -218,8 +227,8 @@ void genBuffers(std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashT
                     //auto checkValue = blocks -> find({std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, std::get<2>(coordinates) + dir.z});
                     //if(checkValue != blocks -> end())
                     //    continue;
-                    auto checkValue = blockss.find({std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, std::get<2>(coordinates) + dir.z});
-                    if(checkValue != blockss.end())
+                    auto checkValue = blocks -> find({std::get<0>(coordinates) + dir.x, std::get<1>(coordinates) + dir.y, std::get<2>(coordinates) + dir.z});
+                    if(checkValue != blocks -> end())
                         continue;
 
                 }
@@ -260,7 +269,7 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, noise::module::Perlin& fina
     xBlockOffset = pos.first * nBlockSide;
     zBlockOffset = pos.second * nBlockSide;
  
-    futTerrain = std::async(std::launch::async, genTerrain, terrainBlocks, xBlockOffset, zBlockOffset, std::ref(finalTerrain));
+    futTerrain = std::async(std::launch::async, genTerrain, &blocks, terrainBlocks, xBlockOffset, zBlockOffset, std::ref(finalTerrain));
     
     //va = std::shared_ptr<VertexArray>{ new VertexArray{} };
     va = std::shared_ptr<VertexArray>{ nullptr };
@@ -275,7 +284,7 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, noise::module::Perlin& fina
     firstGeneration = false;
     //updateBuffers();
     
-    futBuffers = std::async(std::launch::async, genBuffers, nullptr, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain, &vaData, &ebData, &vertexCounter);
+    futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain, &vaData, &ebData, &vertexCounter);
 
     std::cout << "il costruttore dovrebbe aver finito il suo compito" <<std::endl;
 }
