@@ -67,7 +67,7 @@ class PieceOfWorld {
         bool firstGeneration;
 
         // Remember all the block, all the not specified block is
-        std::map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
+        std::map<std::tuple<int, int, int>, TypeOfBlock> blocks;
 
         std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks;
 
