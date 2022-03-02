@@ -5,11 +5,23 @@
 
 using namespace std::chrono_literals;
 
+// MAP
+//static std::shared_mutex _lockMap;
+//static std::unique_lock< Lock > WriteLock;
+//static std::shared_lock< Lock > ReadLock;
+
+// Vectors
 static std::mutex _lock;
 
-void genTerrain (std::map<std::tuple<int, int, int>, TypeOfBlock>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks,int xBlockOffest, int zBockOffset, noise::module::Perlin& finalTerrain) {
+
+
+void genTerrain (ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks,int xBlockOffest, int zBockOffset, noise::module::Perlin& finalTerrain) {
 
     //std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
+
+    // get upgradable access
+    //std::upgrade_lock<std::shared_mutex> lock(_lockMap);
+
 
     for(int x = 0; x < nBlockSide; ++x) {
 
@@ -21,7 +33,9 @@ void genTerrain (std::map<std::tuple<int, int, int>, TypeOfBlock>* blocks, std::
 
             int heightCol = (finalTerrain.GetValue(xWorld * 0.001, zWorld * 0.001, 0.0f) + 1) * (256.0f / 2.0f);
 
-            std::lock_guard<std::mutex> locker(_lock);
+            //std::lock_guard<std::mutex> locker(_lock);
+            // get exclusive access
+            //std::upgrade_to_unique_lock<std::shared_mutex> uniqueLock(lock);
 
             for(int y = 0; y < heightCol; ++y) {
 
@@ -31,6 +45,8 @@ void genTerrain (std::map<std::tuple<int, int, int>, TypeOfBlock>* blocks, std::
                 // else if (y < 170) blocks[{x, y, z}] = TypeOfBlock::STONE;
                 // else blocks[{x, y, z}] = TypeOfBlock::SNOW;
 
+                //std::lock_guard<std::shared_mutex> g(_lockMap);
+                _lock.lock();
                 if (y < 70) blocks -> insert({{x, y, z}, TypeOfBlock::STONE}); 
                 else if (y < 80) blocks -> insert({{x, y, z}, TypeOfBlock::STONE});
                 else if (y < 130) blocks -> insert({{x, y, z}, TypeOfBlock::SOIL});
@@ -38,9 +54,13 @@ void genTerrain (std::map<std::tuple<int, int, int>, TypeOfBlock>* blocks, std::
                 else blocks -> insert({{x, y, z}, TypeOfBlock::SNOW});
 
                 terrainBlocks -> insert({xWorld, y, zWorld});
+                _lock.unlock();
 
             }
 
+            //std::lock_guard<std::shared_mutex> g(_lockMap);
+
+            _lock.lock();
             for(int y = heightCol; y < 70; ++y)
                 blocks -> insert({{x, y, z}, TypeOfBlock::SNOW});
                 //blocks.operator[] ({x, y, z}) = TypeOfBlock::WATER;
@@ -48,10 +68,12 @@ void genTerrain (std::map<std::tuple<int, int, int>, TypeOfBlock>* blocks, std::
             if(blocks -> find({x, heightCol - 1, z}) -> second == TypeOfBlock::STONE || blocks -> find({x, heightCol - 1, z}) -> second == TypeOfBlock::SOIL)
                 blocks -> insert({{x, heightCol - 1, z}, TypeOfBlock::GRASS});
                 //blocks.operator[] ({x, heightCol - 1, z}) = TypeOfBlock::GRASS;
+            _lock.unlock();
 
         }
     }
     //return blocks;
+    std::cout << blocks -> size() << " dim del terreno generato" <<std::endl;
 }
 
 bool faceToDraw(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, float xoffset, float zoffset, float halfDim, glm::vec3 dir, glm::vec3 cameraPos) {
@@ -160,7 +182,7 @@ std::vector<unsigned int> getIndecesOfAFace(unsigned int counter) {
     return data;
 }
 
-void genBuffers(std::map<std::tuple<int, int, int>, TypeOfBlock>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks, float halfDim, float xoffset, float zoffset, int xBlockOffset, int zBlockOffset, glm::vec3 cameraPos, std::shared_future<void> futTerrain, std::vector<float>* vertecies, std::vector<unsigned int>* indeces, unsigned int* counter) {
+void genBuffers(ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks, float halfDim, float xoffset, float zoffset, int xBlockOffset, int zBlockOffset, glm::vec3 cameraPos, std::shared_future<void> futTerrain, std::vector<float>* vertecies, std::vector<unsigned int>* indeces, unsigned int* counter) {
 
     //std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blockss;
     //_lock.lock();
@@ -171,6 +193,8 @@ void genBuffers(std::map<std::tuple<int, int, int>, TypeOfBlock>* blocks, std::u
     //std::vector<float> vertecies{};
     //std::vector<unsigned int> indeces{};
     *counter = 0;
+
+    //std::shared_lock<std::shared_mutex> lock(_lockMap);
 
     //for(auto itr = blocks -> begin(); itr != blocks -> end(); ++itr) {
     for(auto itr = blocks -> begin(); itr != blocks -> end(); ++itr) {
@@ -284,7 +308,7 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, noise::module::Perlin& fina
     firstGeneration = false;
     //updateBuffers();
     
-    futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain, &vaData, &ebData, &vertexCounter);
+    //futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain, &vaData, &ebData, &vertexCounter);
 
     std::cout << "il costruttore dovrebbe aver finito il suo compito" <<std::endl;
 }

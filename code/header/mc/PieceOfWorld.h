@@ -8,6 +8,8 @@
 #include <memory>
 #include <libnoise/noise.h>
 #include <future>
+#include <mutex>
+#include <shared_mutex>
 #include <chrono>
 
 #include "noiseutils.h"
@@ -46,6 +48,60 @@ constexpr unsigned int indOfFaces[] = {
     2, 3, 1,
 };
 
+template<class Key, class Value>
+class ThreadSafeMap
+{
+    std::mutex m_;
+    std::map<Key, Value> c_;
+
+public:
+    Value get(Key const& k) {
+        std::unique_lock<decltype(m_)> lock(m_);
+        return c_[k]; // Return a copy.
+    }
+
+    template<class Value2>
+    void set(Key const& k, Value2&& v) {
+        std::unique_lock<decltype(m_)> lock(m_);
+        c_[k] = std::forward<Value2>(v);
+    }
+
+    template<class Value2>
+    void insert(std::pair<Key const&, Value2&&> entry) {
+        std::unique_lock<decltype(m_)> lock(m_);
+        c_[entry.first] = std::forward<Value2>(entry.second);
+    }
+
+    template<class Value2>
+    typename::std::map<Key, Value>::iterator find(std::pair<Key const&, Value2&&> entry) {
+        std::unique_lock<decltype(m_)> lock(m_);
+        //c_[k] = std::forward<Value2>(v);
+        return c_.find(entry);
+    }
+
+    template<class Value2>
+    void erase(Key const& k) {
+        std::unique_lock<decltype(m_)> lock(m_);
+        //c_[k] = std::forward<Value2>(v);
+        return c_.erase(k);
+    }
+
+    template<class Value2>
+    int size() {
+        return c_.size();
+    }
+
+    template<class Value2>
+    typename::std::map<Key, Value>::iterator begin() {
+        return c_.begin();
+    }
+
+    template<class Value2>
+    typename::std::map<Key, Value>::iterator end() {
+        return c_.end();
+    }
+};
+
 class PieceOfWorld {
 
     private:
@@ -67,7 +123,7 @@ class PieceOfWorld {
         bool firstGeneration;
 
         // Remember all the block, all the not specified block is
-        std::map<std::tuple<int, int, int>, TypeOfBlock> blocks;
+        ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock> blocks;
 
         std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks;
 
