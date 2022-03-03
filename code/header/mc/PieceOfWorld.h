@@ -9,7 +9,7 @@
 #include <libnoise/noise.h>
 #include <future>
 #include <mutex>
-#include <shared_mutex>
+//#include <shared_mutex>
 #include <chrono>
 
 #include "noiseutils.h"
@@ -60,46 +60,43 @@ public:
         return c_[k]; // Return a copy.
     }
 
-    template<class Value2>
-    void set(Key const& k, Value2&& v) {
+    //void set(Key const& k, Value&& v) {
+    void set(Key const& k, Value& v) {
         std::unique_lock<decltype(m_)> lock(m_);
-        c_[k] = std::forward<Value2>(v);
+        c_[k] = std::forward<Value>(v);
     }
 
-    template<class Value2>
-    void insert(std::pair<Key const&, Value2&&> entry) {
+    void insert(std::pair<Key const&, Value&&> entry) {
         std::unique_lock<decltype(m_)> lock(m_);
-        c_[entry.first] = std::forward<Value2>(entry.second);
+        c_[entry.first] = std::forward<Value>(entry.second);
     }
 
-    template<class Value2>
-    typename::std::map<Key, Value>::iterator find(std::pair<Key const&, Value2&&> entry) {
+    //typename::std::map<Key, Value>::iterator find(std::pair<Key const&, Value&&> entry) {
+    typename::std::map<Key, Value>::iterator find(Key const& key) {
         std::unique_lock<decltype(m_)> lock(m_);
         //c_[k] = std::forward<Value2>(v);
-        return c_.find(entry);
+        return c_.find(key);
+        //return c_.find(entry);
     }
 
-    template<class Value2>
     void erase(Key const& k) {
         std::unique_lock<decltype(m_)> lock(m_);
-        //c_[k] = std::forward<Value2>(v);
-        return c_.erase(k);
+        c_.erase(k);
     }
 
-    template<class Value2>
     int size() {
         return c_.size();
     }
 
-    template<class Value2>
     typename::std::map<Key, Value>::iterator begin() {
         return c_.begin();
     }
 
-    template<class Value2>
     typename::std::map<Key, Value>::iterator end() {
         return c_.end();
     }
+
+    // TODO assign operator and copy contructor
 };
 
 class PieceOfWorld {

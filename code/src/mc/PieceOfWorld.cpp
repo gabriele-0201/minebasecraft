@@ -47,11 +47,11 @@ void genTerrain (ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>* blocks, 
 
                 //std::lock_guard<std::shared_mutex> g(_lockMap);
                 _lock.lock();
-                if (y < 70) blocks -> insert({{x, y, z}, TypeOfBlock::STONE}); 
-                else if (y < 80) blocks -> insert({{x, y, z}, TypeOfBlock::STONE});
-                else if (y < 130) blocks -> insert({{x, y, z}, TypeOfBlock::SOIL});
-                else if (y < 170) blocks -> insert({{x, y, z}, TypeOfBlock::STONE});
-                else blocks -> insert({{x, y, z}, TypeOfBlock::SNOW});
+                if (y < 70) blocks -> insert(std::make_pair(std::make_tuple(x, y, z), TypeOfBlock::STONE));
+                else if (y < 80) blocks -> insert(std::make_pair(std::make_tuple(x, y, z), TypeOfBlock::SAND));
+                else if (y < 130) blocks -> insert(std::make_pair(std::make_tuple(x, y, z), TypeOfBlock::SOIL));
+                else if (y < 170) blocks -> insert(std::make_pair(std::make_tuple(x, y, z), TypeOfBlock::STONE));
+                else blocks -> insert(std::make_pair(std::make_tuple(x, y, z), TypeOfBlock::SNOW));
 
                 terrainBlocks -> insert({xWorld, y, zWorld});
                 _lock.unlock();
@@ -62,11 +62,11 @@ void genTerrain (ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>* blocks, 
 
             _lock.lock();
             for(int y = heightCol; y < 70; ++y)
-                blocks -> insert({{x, y, z}, TypeOfBlock::SNOW});
+                blocks -> insert(std::make_pair(std::make_tuple(x, y, z), TypeOfBlock::WATER));
                 //blocks.operator[] ({x, y, z}) = TypeOfBlock::WATER;
 
-            if(blocks -> find({x, heightCol - 1, z}) -> second == TypeOfBlock::STONE || blocks -> find({x, heightCol - 1, z}) -> second == TypeOfBlock::SOIL)
-                blocks -> insert({{x, heightCol - 1, z}, TypeOfBlock::GRASS});
+            if(blocks -> find(std::make_tuple(x, heightCol - 1, z)) -> second == TypeOfBlock::STONE || blocks -> find(std::make_tuple(x, heightCol - 1, z)) -> second == TypeOfBlock::SOIL)
+                blocks -> insert(std::make_pair(std::make_tuple(x, heightCol - 1, z), TypeOfBlock::GRASS));
                 //blocks.operator[] ({x, heightCol - 1, z}) = TypeOfBlock::GRASS;
             _lock.unlock();
 
@@ -346,7 +346,8 @@ void PieceOfWorld::breakBlock(unsigned int x, unsigned int y, unsigned int z) {
 
 void PieceOfWorld::addBlock(unsigned int x, unsigned int y, unsigned int z, TypeOfBlock type) {
     //std::cout << "Blocco da aggiungere : " << x << " " << y << " " << z << std::endl;
-    blocks[{x, y, z}] = type;
+    //blocks[{x, y, z}] = type;
+    blocks.set(std::make_tuple(x, y, z), type);
     //updateBuffers();
 
     /*
