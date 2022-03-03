@@ -15,7 +15,7 @@ static std::mutex _lock;
 
 
 
-void genTerrain (ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks,int xBlockOffest, int zBockOffset, noise::module::Perlin& finalTerrain) {
+void genTerrain (ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks,int xBlockOffest, int zBockOffset, noise::module::Perlin& finalTerrain) {
 
     //std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
 
@@ -182,7 +182,7 @@ std::vector<unsigned int> getIndecesOfAFace(unsigned int counter) {
     return data;
 }
 
-void genBuffers(ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks, float halfDim, float xoffset, float zoffset, int xBlockOffset, int zBlockOffset, glm::vec3 cameraPos, std::shared_future<void> futTerrain, std::vector<float>* vertecies, std::vector<unsigned int>* indeces, unsigned int* counter) {
+void genBuffers(ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks, float halfDim, float xoffset, float zoffset, int xBlockOffset, int zBlockOffset, glm::vec3 cameraPos, std::shared_future<void> futTerrain, std::vector<float>* vertecies, std::vector<unsigned int>* indeces, unsigned int* counter) {
 
     //std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blockss;
     //_lock.lock();
