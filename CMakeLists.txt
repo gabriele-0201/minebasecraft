@@ -24,8 +24,6 @@ add_executable(${PROJECT_NAME} code/src/minebasecraft.cpp
     code/src/mc/Player.cpp
     code/src/mc/World.cpp
 
-    code/src/noise/noiseutils.cpp
-
 )
 
 target_link_libraries(${PROJECT_NAME} 

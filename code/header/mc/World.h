@@ -8,8 +8,6 @@
 #include <time.h>
 #include <future>
 
-#include "noiseutils.h"
-
 #include "Enums.h"
 #include "PieceOfWorld.h"
 #include "HashTuples.h"
@@ -32,12 +30,6 @@ class World {
         std::vector<std::pair<int, int>> getNearPieceOfWorld(int x, int z, int distance);
         std::pair<int, int> currentPos;
 
-        module::RidgedMulti mountainTerrain;
-        module::Billow baseFlatTerrain;
-        module::ScaleBias flatTerrain;
-        module::Perlin terrainType;
-        module::Select terrainSelector;
-        module::Turbulence finalTerrain;
         noise::module::Perlin perl;
 
         int renderingBlockDistance = 15;

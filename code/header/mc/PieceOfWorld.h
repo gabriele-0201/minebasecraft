@@ -18,6 +18,7 @@
 #include "VertexArray.h"
 #include "ElementBuffer.h"
 #include "GLC.h"
+#include "ThreadSafeMap.h"
 
 constexpr int nBlockSide = 16;
 constexpr int nBlockHeight = 256;
@@ -67,7 +68,7 @@ class PieceOfWorld {
         bool firstGeneration;
 
         // Remember all the block, all the not specified block is
-        ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
+        ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock> blocks;
 
         std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks;
 
