@@ -5,7 +5,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 project(minebasecraft)
 
-include_directories("code/header/graphics" "code/header/mc" "code/header/noise")
+include_directories("code/header/graphics" "code/header/mc")
 
 add_executable(${PROJECT_NAME} code/src/minebasecraft.cpp
     
@@ -23,7 +23,6 @@ add_executable(${PROJECT_NAME} code/src/minebasecraft.cpp
     code/src/mc/PieceOfWorld.cpp
     code/src/mc/Player.cpp
     code/src/mc/World.cpp
-
 )
 
 target_link_libraries(${PROJECT_NAME} 

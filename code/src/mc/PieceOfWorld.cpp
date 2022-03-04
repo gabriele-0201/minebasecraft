@@ -13,8 +13,7 @@ using namespace std::chrono_literals;
 // Vectors
 static std::mutex _lock;
 
-static std::atomic_bool finishedBuffers{false};
-static std::atomic_bool finishedTerrain{false};
+std::atomic_bool finishTerrain = false;
 
 void genTerrain (ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks,int xBlockOffest, int zBockOffset, noise::module::Perlin& finalTerrain) {
 
@@ -22,7 +21,6 @@ void genTerrain (ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>* blocks, 
 
     // get upgradable access
     //std::upgrade_lock<std::shared_mutex> lock(_lockMap);
-
 
     for(int x = 0; x < nBlockSide; ++x) {
 
@@ -73,9 +71,9 @@ void genTerrain (ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>* blocks, 
 
         }
     }
-    //return blocks;
     std::cout << blocks -> size() << " dim del terreno generato" <<std::endl;
-    finishedTerrain = true;
+    finishTerrain = true;
+    return;
 }
 
 bool faceToDraw(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, float xoffset, float zoffset, float halfDim, glm::vec3 dir, glm::vec3 cameraPos) {
@@ -186,21 +184,14 @@ std::vector<unsigned int> getIndecesOfAFace(unsigned int counter) {
 
 void genBuffers(ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks, float halfDim, float xoffset, float zoffset, int xBlockOffset, int zBlockOffset, glm::vec3 cameraPos, std::shared_future<void> futTerrain, std::vector<float>* vertecies, std::vector<unsigned int>* indeces, unsigned int* counter) {
 
-    //std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blockss;
-    //_lock.lock();
     //if(futTerrain.valid())
         //futTerrain.get();
-    //_lock.unlock()
+    while(!finishTerrain);
 
-    while(!finishedTerrain) std::this_thread::sleep_for(1ms);
-
-    //std::vector<float> vertecies{};
-    //std::vector<unsigned int> indeces{};
-    *counter = 0;
+    (*counter) = 0;
 
     //std::shared_lock<std::shared_mutex> lock(_lockMap);
 
-    //for(auto itr = blocks -> begin(); itr != blocks -> end(); ++itr) {
     for(auto itr = blocks -> begin(); itr != blocks -> end(); ++itr) {
 
         if((itr -> second) == TypeOfBlock::SKY)
@@ -279,9 +270,7 @@ void genBuffers(ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>* blocks, s
     }
 
     //return {vertecies, indeces, counter};
-
     std::cout << "Dovrei aver finito di generare i bufffers" <<std::endl;
-    finishedBuffers = true;
 }
 
 
@@ -378,9 +367,8 @@ std::shared_ptr<VertexArray> PieceOfWorld::getVertexArray() {
     //     updateBuffers();
     // }
 
-     
-    //if(!futTerrain.valid() || isReady(futTerrain)) {
-    if(finishedTerrain) {
+    if(!futTerrain.valid() || isReady(futTerrain)) {
+    //if(finishedTerrain) {
     
         // Just finisched generatin the terrain
         // if(va == nullptr && !futBuffers.valid()) {
@@ -392,8 +380,7 @@ std::shared_ptr<VertexArray> PieceOfWorld::getVertexArray() {
         // }
 
         // the future of the buffers has to be valid and finished
-        //if(futBuffers.valid() && isReady(futBuffers)) {
-        if(finishedBuffers) {
+        if(futBuffers.valid() && isReady(futBuffers)) {
             
                 //futBuffers.get();
 
