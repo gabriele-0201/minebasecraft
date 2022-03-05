@@ -1,6 +1,12 @@
 #ifndef THREADSAFAMAP_H
 #define THREADSAFAMAP_H
 
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
+#include <map>
+
 class RWL {
     private:
        std::atomic_int readRequests{0};
@@ -17,7 +23,7 @@ class RWL {
                 readRequests--;
                 std::unique_lock<std::mutex> lock(mRead);
                 readRequests++;
-                lock.unlock();
+                //lock.unlock();
             }
         }
 
