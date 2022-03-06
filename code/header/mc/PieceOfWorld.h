@@ -68,6 +68,7 @@ class PieceOfWorld {
         //std::atomic_bool finishedTerrain;
         bool generatingBuffer;
         bool firstGeneration;
+        int counterPieces;
 
         // Remember all the block, all the not specified block is
         //ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock> blocks;
