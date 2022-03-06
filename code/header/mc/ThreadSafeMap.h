@@ -23,7 +23,7 @@ class RWL {
                 readRequests--;
                 std::unique_lock<std::mutex> lock(mRead);
                 readRequests++;
-                //lock.unlock();
+                lock.unlock();
             }
         }
 

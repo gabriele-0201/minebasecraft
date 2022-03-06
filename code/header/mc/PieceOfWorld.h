@@ -64,17 +64,23 @@ class PieceOfWorld {
         //bool generatedTerrain;
         //std::future<std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int>> futBuffers;
         std::future<void> futBuffers;
+
+        //std::atomic_bool finishedTerrain;
         bool generatingBuffer;
         bool firstGeneration;
 
         // Remember all the block, all the not specified block is
-        ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock> blocks;
+        //ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock> blocks;
+        std::shared_ptr<ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>> blocks;
 
         std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks;
 
-        std::vector<float> vaData;
-        std::vector<unsigned int> ebData;
-        unsigned int vertexCounter;
+        //std::vector<float> vaData;
+        //std::vector<unsigned int> ebData;
+        //unsigned int vertexCounter;
+        std::shared_ptr<std::vector<float>> vaData;
+        std::shared_ptr<std::vector<unsigned int>> ebData;
+        std::shared_ptr<unsigned int> vertexCounter;
 
         //std::vector<float> getVerteciesOfAFace(unsigned int, unsigned int, unsigned int, glm::vec3 dir, TypeOfBlock type);
         //std::vector<unsigned int> getIndecesOfAFace(int counter) const;
@@ -99,6 +105,7 @@ class PieceOfWorld {
         // Some way to get NOISE
         PieceOfWorld();
         PieceOfWorld(std::pair<int, int>, noise::module::Perlin& finalTerrain, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* _terrainBlocks);
+        //~PieceOfWorld();
 
         //std::vector<float> getVertecies() const;
         //std::vector<unsigned int> getIndecies() const;

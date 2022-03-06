@@ -16,9 +16,7 @@ static std::mutex _lockTerrain;
 
 static std::mutex _lockBlocks;
 
-static std::atomic_bool finischedTerrain;
-
-void genTerrain (ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks,int xBlockOffest, int zBockOffset, noise::module::Perlin& finalTerrain) {
+void genTerrain (std::shared_ptr<ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>> blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks,int xBlockOffest, int zBockOffset, noise::module::Perlin& finalTerrain) {
 
     //std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple> blocks;
 
@@ -76,7 +74,7 @@ void genTerrain (ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>* blocks, 
         }
     }
     std::cout << blocks -> size() << " dim del terreno generato" <<std::endl;
-    finischedTerrain = true;
+    //finischedTerrain = true;
     return;
 }
 
@@ -186,15 +184,18 @@ std::vector<unsigned int> getIndecesOfAFace(unsigned int counter) {
     return data;
 }
 
-void genBuffers(ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>* blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks, float halfDim, float xoffset, float zoffset, int xBlockOffset, int zBlockOffset, glm::vec3 cameraPos, std::shared_future<void> futTerrain, std::vector<float>* vertecies, std::vector<unsigned int>* indeces, unsigned int* counter) {
+void genBuffers(std::shared_ptr<ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>> blocks, std::unordered_set<std::tuple<int, int, int>, HashTuples::hash3tuple>* terrainBlocks, float halfDim, float xoffset, float zoffset, int xBlockOffset, int zBlockOffset, glm::vec3 cameraPos, std::shared_future<void> futTerrain, std::shared_ptr<std::vector<float>> vertecies, std::shared_ptr<std::vector<unsigned int>> indeces, std::shared_ptr<unsigned int> counter) {
 
     //if(futTerrain.valid())
         //futTerrain.get();
+
+    //while(!finischedTerrain) std::this_thread::yield;
 
     (*counter) = 0;
 
     //std::shared_lock<std::shared_mutex> lock(_lockMap);
 
+    std::lock_guard<std::mutex> locker(_lockBlocks);
     for(auto itr = blocks -> begin(); itr != blocks -> end(); ++itr) {
 
         if((itr -> second) == TypeOfBlock::SKY)
@@ -266,7 +267,7 @@ void genBuffers(ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>* blocks, s
                     vertecies->push_back(v);
 
                 // work on indeces
-                std::vector<unsigned int> blockInds = getIndecesOfAFace(*counter);
+                std::vector<unsigned int> blockInds = getIndecesOfAFace((*counter));
                 //indeces -> insert(indeces -> end(), blockInds.begin(), blockInds.end());
 
                 for(auto i: blockInds)
@@ -296,13 +297,19 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, noise::module::Perlin& fina
     
     xBlockOffset = pos.first * nBlockSide;
     zBlockOffset = pos.second * nBlockSide;
+
+    blocks = std::shared_ptr<ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>> { new ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock> {}};
  
-    futTerrain = std::async(std::launch::async, genTerrain, &blocks, terrainBlocks, xBlockOffset, zBlockOffset, std::ref(finalTerrain));
+    futTerrain = std::async(std::launch::async, genTerrain, blocks, terrainBlocks, xBlockOffset, zBlockOffset, std::ref(finalTerrain));
     
     //va = std::shared_ptr<VertexArray>{ new VertexArray{} };
     va = std::shared_ptr<VertexArray>{ nullptr };
     vb = std::shared_ptr<VertexBuffer>{ new VertexBuffer{} };
     eb = std::shared_ptr<ElementBuffer>{ new ElementBuffer{nullptr, 0} };
+
+    vaData = std::shared_ptr<std::vector<float>> { new std::vector<float>() };
+    ebData = std::shared_ptr<std::vector<unsigned>> { new std::vector<unsigned int>() };
+    vertexCounter = std::shared_ptr<unsigned int> { new unsigned int };
     
     layout = std::shared_ptr<VertexBufferLayout> { new VertexBufferLayout{} };
     layout -> push<float>(3);
@@ -315,31 +322,30 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, noise::module::Perlin& fina
     //if(futTerrain.valid())
         futTerrain.get();
 
-    std::cout<< "Ok, sembra che adesso finisca" <<std::endl;
-
-    futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain, &vaData, &ebData, &vertexCounter);
+    futBuffers = std::async(std::launch::async, genBuffers, blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain, vaData, ebData, vertexCounter);
 
     std::cout << "il costruttore dovrebbe aver finito il suo compito" <<std::endl;
 }
 
 void PieceOfWorld::bindBuffers() {
 
-    vb -> updateData(&(vaData[0]), (vertexCounter * 4) * 5 * sizeof(float));
+    std::lock_guard<std::mutex> lock(_lockBuffs);
+    vb -> updateData(&((*vaData)[0]), (*vertexCounter * 4) * 5 * sizeof(float));
     va -> bindVb(*vb, *layout);
 
     // update also the idex buffer in the future (when I will render more than one cube)
     // SIX indeces for each face
-    eb -> updateData(&(ebData[0]), vertexCounter * 6);
+    eb -> updateData(&((*ebData)[0]), *vertexCounter * 6);
 
 }
 
 bool PieceOfWorld::isBlock(unsigned int x, unsigned int y, unsigned int z) {
-    return blocks.find({x, y, z}) != blocks.end();
+    return blocks -> find({x, y, z}) != blocks -> end();
 }
 
 void PieceOfWorld::breakBlock(unsigned int x, unsigned int y, unsigned int z) {
     //std::cout << "Blocco da rimuovere: " << x << " " << y << " " << z << std::endl;
-    blocks.erase(std::make_tuple(x, y, z));
+    blocks -> erase(std::make_tuple(x, y, z));
     //updateBuffers();
 
     /*
@@ -349,7 +355,7 @@ void PieceOfWorld::breakBlock(unsigned int x, unsigned int y, unsigned int z) {
     }
     */
     if(!futBuffers.valid()) {
-        futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain, &vaData, &ebData, &vertexCounter);
+        futBuffers = std::async(std::launch::async, genBuffers, blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain, vaData, ebData, vertexCounter);
     }
 }
 
@@ -357,7 +363,7 @@ void PieceOfWorld::addBlock(unsigned int x, unsigned int y, unsigned int z, Type
     //std::cout << "Blocco da aggiungere : " << x << " " << y << " " << z << std::endl;
     //blocks[{x, y, z}] = type;
     //blocks.set(std::make_tuple(x, y, z), type);
-    blocks.insert(std::make_pair(std::make_tuple(x, y, z), type));
+    blocks -> insert(std::make_pair(std::make_tuple(x, y, z), type));
     //updateBuffers();
 
     /*
@@ -367,7 +373,7 @@ void PieceOfWorld::addBlock(unsigned int x, unsigned int y, unsigned int z, Type
     }
     */
     if(!futBuffers.valid()) {
-        futBuffers = std::async(std::launch::async, genBuffers, &blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain, &vaData, &ebData, &vertexCounter);
+        futBuffers = std::async(std::launch::async, genBuffers, blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain, vaData, ebData, vertexCounter);
     }
 }
 
@@ -395,7 +401,7 @@ std::shared_ptr<VertexArray> PieceOfWorld::getVertexArray() {
         // the future of the buffers has to be valid and finished
         if(futBuffers.valid() && isReady(futBuffers)) {
             
-                //futBuffers.get();
+                futBuffers.get();
 
                 if(va == nullptr)
                     va = std::shared_ptr<VertexArray>{ new VertexArray{} };
