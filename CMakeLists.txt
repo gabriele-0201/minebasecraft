@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 
 set(CMAKE_BUILD_TYPE)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O3")
 
 project(minebasecraft)
 
