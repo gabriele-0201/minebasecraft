@@ -11,32 +11,6 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
 
     srand(time(NULL));
 
-    /*
-    baseFlatTerrain.SetFrequency (2.0);
-    baseFlatTerrain.SetSeed(rand() % 100);
-
-    flatTerrain.SetSourceModule (0, baseFlatTerrain);
-    flatTerrain.SetScale (0.125);
-    flatTerrain.SetBias (-0.75);
-    //flatTerrain.SetSeed(rand() % 100);
-
-    terrainType.SetFrequency (0.5);
-    terrainType.SetPersistence (0.25);
-    terrainType.SetSeed(rand() % 100);
-
-    terrainSelector.SetSourceModule (0, flatTerrain);
-    terrainSelector.SetSourceModule (1, mountainTerrain);
-    terrainSelector.SetControlModule (terrainType);
-    terrainSelector.SetBounds (0.0, 1000.0);
-    terrainSelector.SetEdgeFalloff (0.125);
-    //terrainSelector.SetSeed(rand() % 100);
-
-    finalTerrain.SetSourceModule (0, terrainSelector);
-    finalTerrain.SetFrequency (2.0);
-    finalTerrain.SetPower (0.125);
-    finalTerrain.SetSeed(rand() % 100);
-    */
-
     perl.SetSeed(rand() % 100);
     perl.SetOctaveCount (10);
     perl.SetFrequency (2.0);
@@ -44,8 +18,6 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
     
     std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(0, 0, renderingBlockDistance);
     for(auto n: nears) {
-        //std::cout << n.first << " " << n.second << std::endl;
-
         terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, perl, &terrainBlocks);
     }
 
@@ -78,9 +50,7 @@ std::vector<std::shared_ptr<VertexArray> > World::getAllVertexArrays() {
             arrays.push_back(v);
         // arrays.push_back(terrain[{n.first, n.second}].getVertexArray());
     }
-
     return arrays;
-
 }
 
 std::vector<std::shared_ptr<ElementBuffer> > World::getAllElementBuffers() {

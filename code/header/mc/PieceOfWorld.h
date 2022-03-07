@@ -59,20 +59,13 @@ class PieceOfWorld {
 
         float halfDim;
 
-        //std::shared_future<std::unordered_map<std::tuple<int, int, int>, TypeOfBlock, HashTuples::hash3tuple>> futTerrain;
         std::shared_future<void> futTerrain;
-        //bool generatedTerrain;
-        //std::future<std::tuple<std::vector<float>, std::vector<unsigned int>, unsigned int>> futBuffers;
         std::future<void> futBuffers;
 
-        //std::atomic_bool finishedTerrain;
-        bool generatingBuffer;
-        bool firstGeneration;
         int counterPieces;
 
-        // AAAAAAAAAAAA
-        std::mutex _lockBlocks;
-        std::mutex _lockBuffs;
+        std::shared_ptr<std::mutex> _lockBlocks;
+        std::shared_ptr<std::mutex> _lockBuffs;
 
         // Remember all the block, all the not specified block is
         //ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock> blocks;
