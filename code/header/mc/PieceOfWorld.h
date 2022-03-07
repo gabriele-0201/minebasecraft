@@ -70,6 +70,10 @@ class PieceOfWorld {
         bool firstGeneration;
         int counterPieces;
 
+        // AAAAAAAAAAAA
+        std::mutex _lockBlocks;
+        std::mutex _lockBuffs;
+
         // Remember all the block, all the not specified block is
         //ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock> blocks;
         std::shared_ptr<ThreadSafeMap<std::tuple<int, int, int>, TypeOfBlock>> blocks;
