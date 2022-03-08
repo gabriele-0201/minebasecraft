@@ -42,12 +42,14 @@ void genTerrain (std::shared_ptr<ThreadSafeMap<std::tuple<int, int, int>, TypeOf
             for(int y = heightCol; y < 70; ++y)
                 blocks -> insert(std::make_pair(std::make_tuple(x, y, z), TypeOfBlock::WATER));
 
-            if(blocks -> find(std::make_tuple(x, heightCol - 1, z)) -> second == TypeOfBlock::STONE || blocks -> find(std::make_tuple(x, heightCol - 1, z)) -> second == TypeOfBlock::SOIL)
+            if(blocks -> find(std::make_tuple(x, heightCol - 1, z)) -> second == TypeOfBlock::STONE || blocks -> find(std::make_tuple(x, heightCol - 1, z)) -> second == TypeOfBlock::SOIL) {
                 blocks -> insert(std::make_pair(std::make_tuple(x, heightCol - 1, z), TypeOfBlock::GRASS));
+                //std::cout << "sssuss" << std::endl;
+            }
         }
     }
 
-    std::cout << blocks -> size() << " dim del terreno generato" <<std::endl;
+    //std::cout << blocks -> size() << " dim del terreno generato" <<std::endl;
 
     _lockPieces.lock();
     piecesLocked.erase(counterLockPiece);
@@ -169,8 +171,8 @@ void genBuffers(std::shared_ptr<ThreadSafeMap<std::tuple<int, int, int>, TypeOfB
 
     for(auto itr = blocks -> begin(); itr != blocks -> end(); ++itr) {
 
-        if((itr -> second) == TypeOfBlock::SKY)
-            continue;
+        //if((itr -> second) == TypeOfBlock::SKY)
+            //continue;
             
         // work on vertecies
         std::tuple<int, int, int> coordinates = itr -> first;
@@ -246,7 +248,7 @@ void genBuffers(std::shared_ptr<ThreadSafeMap<std::tuple<int, int, int>, TypeOfB
     }
 
     //return {vertecies, indeces, counter};
-    std::cout << "Dovrei aver finito di generare i bufffers" <<std::endl;
+    //std::cout << "Dovrei aver finito di generare i bufffers" <<std::endl;
 }
 
 
@@ -298,7 +300,7 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, noise::module::Perlin& fina
 
     futBuffers = std::async(std::launch::async, genBuffers, blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain, vaData, ebData, vertexCounter, counterPieces, _lockBuffs);
 
-    std::cout << "il costruttore dovrebbe aver finito il suo compito" <<std::endl;
+    //std::cout << "il costruttore dovrebbe aver finito il suo compito" <<std::endl;
 }
 
 void PieceOfWorld::bindBuffers() {
@@ -356,6 +358,21 @@ std::shared_ptr<VertexArray> PieceOfWorld::getVertexArray() {
 }
 
 std::shared_ptr<ElementBuffer> PieceOfWorld::getElementBuffer() {
+    if(!futTerrain.valid() || isReady(futTerrain)) {
+
+        if(futTerrain.valid() && isReady(futTerrain))
+            futTerrain.get();
+
+        if(futBuffers.valid() && isReady(futBuffers)) {
+            
+                futBuffers.get();
+
+                if(va == nullptr)
+                    va = std::shared_ptr<VertexArray>{ new VertexArray{} };
+
+        }
+    }
+
     return eb;
 }
 

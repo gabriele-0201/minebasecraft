@@ -10,7 +10,8 @@ namespace HashTuples{
         template <class T1, class T2, class T3>
         std::size_t operator()(const std::tuple<T1, T2, T3>& x) const
         {
-            return std::get<0>(x) ^ std::get<1>(x) ^ std::get<2>(x);
+            //return std::get<0>(x) ^ std::get<1>(x) ^ std::get<2>(x);
+            return std::get<0>(x) + (31 * std::get<1>(x)) + (31 * 31 * std::get<2>(x));
         }
     };
     
@@ -19,10 +20,10 @@ namespace HashTuples{
         template <class T1, class T2>
         std::size_t operator()(const std::tuple<T1, T2>& x) const
         {
-            return std::get<0>(x) ^ std::get<1>(x);
+            //return std::get<0>(x) ^ std::get<1>(x);
+            return std::get<0>(x) + (31 * std::get<1>(x));
         }
     };
-
 }
 
 #endif

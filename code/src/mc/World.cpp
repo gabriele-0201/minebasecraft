@@ -5,8 +5,8 @@
 
 World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
 
-    renderingBlockDistance = 1;
-    viewBlockDistance = 1;
+    renderingBlockDistance = 14;
+    viewBlockDistance = 10;
     currentPos = {0,0};
 
     srand(time(NULL));
@@ -15,11 +15,8 @@ World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
     perl.SetOctaveCount (10);
     perl.SetFrequency (2.0);
     perl.SetPersistence (0.5); 
-    
-    std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(0, 0, renderingBlockDistance);
-    for(auto n: nears) {
-        terrain[{n.first, n.second}] = PieceOfWorld({n.first, n.second}, perl, &terrainBlocks);
-    }
+
+    updatePos(0, 0, glm::vec3());
 
 }
 
@@ -42,13 +39,18 @@ std::vector<std::pair<int, int>> World::getNearPieceOfWorld(int x, int z, int di
 std::vector<std::shared_ptr<VertexArray> > World::getAllVertexArrays() {
 
     std::vector<std::shared_ptr<VertexArray>> arrays{};
+    
+    //std::cout << "Currently " << currentPos.first << " - " << currentPos.second << std::endl;
 
     std::vector<std::pair<int, int>> nears = getNearPieceOfWorld(currentPos.first, currentPos.second, viewBlockDistance);
     for(auto n: nears) {
         auto v = terrain[{n.first, n.second}].getVertexArray();
-        if(v != nullptr)
+        if(v != nullptr) {
             arrays.push_back(v);
-        // arrays.push_back(terrain[{n.first, n.second}].getVertexArray());
+            //std::cout << "Nears visible " << n.first << " - " << n.second << std::endl;
+        } else {
+            //std::cout << " questo non e' presente" <<std::endl;
+        }
     }
     return arrays;
 }
@@ -63,7 +65,6 @@ std::vector<std::shared_ptr<ElementBuffer> > World::getAllElementBuffers() {
         auto e = terrain[{n.first, n.second}].getElementBuffer();
         if(e != nullptr)
             arrays.push_back(e);
-        // arrays.push_back(terrain[{n.first, n.second}].getElementBuffer());
     }
 
     return arrays;

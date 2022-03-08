@@ -6,6 +6,7 @@
 #include <mutex>
 #include <thread>
 #include <map>
+#include <unordered_map>
 
 class RWL {
     private:
@@ -44,34 +45,41 @@ class RWL {
 };
 
 template <class Key, class Value, 
-class Compare = std::less<Key>, 
-class Alloc = std::allocator<std::pair<const Key, Value>>>
-class ThreadSafeMap: public std::map<Key, Value, Compare, Alloc> {
+//class Compare = std::less<Key>, 
+class Hash = HashTuples::hash3tuple, 
+class KeyEqual = std::equal_to<Key>,
+//class Alloc = std::allocator<std::pair<const Key, Value>>>
+class Alloc = std::allocator< std::pair<const Key, Value>>>
+//class ThreadSafeMap: public std::map<Key, Value, Compare, Alloc> {
+class ThreadSafeMap: public std::unordered_map<Key, Value, Hash, KeyEqual, Alloc> {
 
     private:
         RWL _lock;
     public: 
 
     //ThreadSafeMap<Key, Value, Compare, Alloc>& operator=(const ThreadSafeMap<Key, Value, Compare, Alloc>& m) {
-    typename::std::map<Key, Value, Compare, Alloc> operator=(const ThreadSafeMap<Key, Value, Compare, Alloc>& m) {
+    typename::std::unordered_map<Key, Value, Hash, KeyEqual, Alloc> operator=(const ThreadSafeMap<Key, Value, Hash, KeyEqual, Alloc>& m) {
         _lock.lockWrite();
-        auto res = std::map<Key, Value, Compare, Alloc>::operator=(m);
+        //auto res = std::map<Key, Value, Compare, Alloc>::operator=(m);
+        auto res = std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::operator=(m);
         _lock.unlockWrite();
         return res;
     }
 
     size_t size() noexcept {
         _lock.lockRead();
-        auto res = std::map<Key, Value, Compare, Alloc>::size();
+        auto res = std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::size();
+        //auto res = std::map<Key, Value, Compare, Alloc>::size();
         _lock.unlockRead();
         return res;
     }
 
     // maybe [] operator
 
-    typename::ThreadSafeMap<Key, Value, Compare, Alloc>::iterator insert(const typename std::map<Key, Value, Compare, Alloc>::value_type& v) {
+    typename::ThreadSafeMap<Key, Value, Hash, KeyEqual, Alloc>::iterator insert(const typename std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::value_type& v) {
         _lock.lockWrite();
-        auto res = std::map<Key, Value, Compare, Alloc>::insert(v);
+        auto res = std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::insert(v);
+        //auto res = std::map<Key, Value, Compare, Alloc>::insert(v);
         _lock.unlockWrite();
         return res.first;
     }
@@ -79,28 +87,32 @@ class ThreadSafeMap: public std::map<Key, Value, Compare, Alloc> {
     //typename::ThreadSafeMap<Key, Value, Compare, Alloc>::iterator erase(const Key& v) {
     size_t erase(const Key& v) {
         _lock.lockWrite();
-        auto res = std::map<Key, Value, Compare, Alloc>::erase(v);
+        auto res = std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::erase(v);
+        //auto res = std::map<Key, Value, Compare, Alloc>::erase(v);
         _lock.unlockWrite();
         return res;
     }
 
-    typename::ThreadSafeMap<Key, Value, Compare, Alloc>::iterator find(const Key& v) {
+    typename::ThreadSafeMap<Key, Value, Hash, KeyEqual, Alloc>::iterator find(const Key& v) {
         _lock.lockRead();
-        auto res = std::map<Key, Value, Compare, Alloc>::find(v);
+        auto res = std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::find(v);
+        //auto res = std::map<Key, Value, Compare, Alloc>::find(v);
         _lock.unlockRead();
         return res;
     }
 
-    typename::ThreadSafeMap<Key, Value, Compare, Alloc>::iterator begin() {
+    typename::ThreadSafeMap<Key, Value, Hash, KeyEqual, Alloc>::iterator begin() {
         _lock.lockRead();
-        auto res = std::map<Key, Value, Compare, Alloc>::begin();
+        auto res = std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::begin();
+        //auto res = std::map<Key, Value, Compare, Alloc>::begin();
         _lock.unlockRead();
         return res;
     }
 
-    typename::ThreadSafeMap<Key, Value, Compare, Alloc>::iterator end() {
+    typename::ThreadSafeMap<Key, Value, Hash, KeyEqual, Alloc>::iterator end() {
         _lock.lockRead();
-        auto res = std::map<Key, Value, Compare, Alloc>::end();
+        auto res = std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::end();
+        //auto res = std::map<Key, Value, Compare, Alloc>::end();
         _lock.unlockRead();
         return res;
     }
