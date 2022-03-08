@@ -75,12 +75,22 @@ class ThreadSafeMap: public std::unordered_map<Key, Value, Hash, KeyEqual, Alloc
     }
 
     // maybe [] operator
-    typename::std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::mapped_type& operator[] ( const Key& k ){
+    // typename::std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::mapped_type& operator[] ( const Key& k ){
+    //     _lock.lockWrite();
+    //     auto res = &std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::operator[](k);
+    //     //auto res = std::map<Key, Value, Compare, Alloc>::insert(v);
+    //     _lock.unlockWrite();
+    //     return *res;
+    // }
+
+    void replace(const typename std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::value_type& v) {
+
         _lock.lockWrite();
-        typename::std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::mapped_type& res = std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::operator[](k);
+        std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::operator[](v.first) = v.second;
         //auto res = std::map<Key, Value, Compare, Alloc>::insert(v);
         _lock.unlockWrite();
-        return res;
+        //return *res;
+
     }
 
     typename::ThreadSafeMap<Key, Value, Hash, KeyEqual, Alloc>::iterator insert(const typename std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::value_type& v) {

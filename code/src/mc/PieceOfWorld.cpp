@@ -43,7 +43,7 @@ void genTerrain (std::shared_ptr<ThreadSafeMap<std::tuple<int, int, int>, TypeOf
                 blocks -> insert(std::make_pair(std::make_tuple(x, y, z), TypeOfBlock::WATER));
 
             if(blocks -> find(std::make_tuple(x, heightCol - 1, z)) -> second == TypeOfBlock::STONE || blocks -> find(std::make_tuple(x, heightCol - 1, z)) -> second == TypeOfBlock::SOIL) {
-                blocks -> operator[](std::make_tuple(x, heightCol - 1, z)) =  TypeOfBlock::GRASS;
+                blocks -> replace(std::make_pair(std::make_tuple(x, heightCol - 1, z), TypeOfBlock::GRASS));
                 //std::cout << "sssuss" << std::endl;
             }
         }

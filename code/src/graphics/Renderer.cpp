@@ -49,8 +49,8 @@ void Renderer::draw() {
 
         GLCall(glDrawElements(GL_TRIANGLES, ebs[i] -> getCount(), GL_UNSIGNED_INT, nullptr));
 
-        vas[i] -> unbind();
-        ebs[i] -> unbind();
+        //vas[i] -> unbind();
+        //ebs[i] -> unbind();
     }
 
     // Send a integer uniform to the shader and it is the id we want to sample
