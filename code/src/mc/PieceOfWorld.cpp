@@ -171,8 +171,8 @@ void genBuffers(std::shared_ptr<ThreadSafeMap<std::tuple<int, int, int>, TypeOfB
 
     for(auto itr = blocks -> begin(); itr != blocks -> end(); ++itr) {
 
-        //if((itr -> second) == TypeOfBlock::SKY)
-            //continue;
+        if((itr -> second) == TypeOfBlock::SKY)
+            continue;
             
         // work on vertecies
         std::tuple<int, int, int> coordinates = itr -> first;
