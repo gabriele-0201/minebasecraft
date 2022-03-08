@@ -370,6 +370,8 @@ std::shared_ptr<ElementBuffer> PieceOfWorld::getElementBuffer() {
                 if(va == nullptr)
                     va = std::shared_ptr<VertexArray>{ new VertexArray{} };
 
+                bindBuffers();
+
         }
     }
 
