@@ -101,10 +101,11 @@ class ThreadSafeMap: public std::unordered_map<Key, Value, Hash, KeyEqual, Alloc
         return res.first;
     }
 
-    //typename::ThreadSafeMap<Key, Value, Compare, Alloc>::iterator erase(const Key& v) {
-    size_t erase(const Key& v) {
+    typename::ThreadSafeMap<Key, Value, Hash, KeyEqual, Alloc>::iterator erase(const Key& v) {
+    //size_t erase(const Key& v) {
         _lock.lockWrite();
-        auto res = std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::erase(v);
+        auto elem = find(v);
+        auto res = std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>::erase(elem);
         //auto res = std::map<Key, Value, Compare, Alloc>::erase(v);
         _lock.unlockWrite();
         return res;

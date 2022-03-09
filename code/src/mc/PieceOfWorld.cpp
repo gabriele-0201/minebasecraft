@@ -214,6 +214,7 @@ void genBuffers(std::shared_ptr<ThreadSafeMap<std::tuple<int, int, int>, TypeOfB
                     zWorld = std::get<2>(coordinates) + zBlockOffset;
                     yWorld = std::get<1>(coordinates);
 
+                    std::lock_guard<std::mutex> locker(_lockTerrain);
                     if(terrainBlocks -> find({xWorld + dir.x, yWorld + dir.y, zWorld + dir.z}) != terrainBlocks -> end())
                         continue;
 
@@ -305,12 +306,17 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, noise::module::Perlin& fina
 
 void PieceOfWorld::bindBuffers() {
 
-    vb -> updateData(&((*vaData)[0]), (*vertexCounter * 4) * 5 * sizeof(float));
-    va -> bindVb(*vb, *layout);
-
     // update also the idex buffer in the future (when I will render more than one cube)
     // SIX indeces for each face
     eb -> updateData(&((*ebData)[0]), *vertexCounter * 6);
+
+    vb -> updateData(&((*vaData)[0]), (*vertexCounter * 4) * 5 * sizeof(float));
+
+    va -> bindVb(*vb, *layout);
+
+    va -> unbind();
+    vb -> unbind();
+    eb -> unbind();
 
 }
 
@@ -320,10 +326,17 @@ bool PieceOfWorld::isBlock(unsigned int x, unsigned int y, unsigned int z) {
 
 void PieceOfWorld::breakBlock(unsigned int x, unsigned int y, unsigned int z) {
 
-    blocks -> erase(std::make_tuple(x, y, z));
+    std::cout << "Breaking a BLOCCK" <<std::endl;
 
+    auto itr = blocks -> erase(std::make_tuple(x, y, z));
+    if(itr == blocks -> end())
+        std::cout << "merda" <<std::endl;
+    else 
+        std::cout << "ok l'ho trovato" <<std::endl;
+    
     if(!futBuffers.valid()) {
         futBuffers = std::async(std::launch::async, genBuffers, blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain, vaData, ebData, vertexCounter, counterPieces, _lockBuffs);
+        std::cout << "Remake the world" <<std::endl;
     }
 }
 
@@ -358,22 +371,9 @@ std::shared_ptr<VertexArray> PieceOfWorld::getVertexArray() {
 }
 
 std::shared_ptr<ElementBuffer> PieceOfWorld::getElementBuffer() {
-    if(!futTerrain.valid() || isReady(futTerrain)) {
 
-        if(futTerrain.valid() && isReady(futTerrain))
-            futTerrain.get();
-
-        if(futBuffers.valid() && isReady(futBuffers)) {
-            
-                futBuffers.get();
-
-                if(va == nullptr)
-                    va = std::shared_ptr<VertexArray>{ new VertexArray{} };
-
-                bindBuffers();
-
-        }
-    }
+    if(va == nullptr)
+        return nullptr;
 
     return eb;
 }
