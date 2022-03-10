@@ -105,7 +105,7 @@ bool faceToDraw(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, f
 
 std::vector<float> getVerteciesOfAFace(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, float halfDim, float xoffset, float zoffset, glm::vec3 dir, TypeOfBlock type, glm::vec3 cameraPos) {
 
-    glm::vec3 coefficents(0.00f, 1.0f, 0.80f);
+    glm::vec3 coefficents(0.90f, 1.0f, 0.80f);
 
     float xCenter = ((float)(Block::DIMBLOCK * xBlock)) + halfDim;
     float yCenter = ((float)(Block::DIMBLOCK * yBlock)) + halfDim;
