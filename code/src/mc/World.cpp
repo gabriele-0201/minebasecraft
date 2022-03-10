@@ -5,8 +5,8 @@
 
 World::World(GLFWwindow* _win, unsigned int seed) : win{_win} {
 
-    renderingBlockDistance = 8;
-    viewBlockDistance = 6;
+    renderingBlockDistance = 0;
+    viewBlockDistance = 0;
     currentPos = {0,0};
 
     srand(time(NULL));

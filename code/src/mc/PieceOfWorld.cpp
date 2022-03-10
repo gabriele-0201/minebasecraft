@@ -105,6 +105,8 @@ bool faceToDraw(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, f
 
 std::vector<float> getVerteciesOfAFace(unsigned int xBlock, unsigned int yBlock, unsigned int zBlock, float halfDim, float xoffset, float zoffset, glm::vec3 dir, TypeOfBlock type, glm::vec3 cameraPos) {
 
+    glm::vec3 coefficents(0.00f, 1.0f, 0.80f);
+
     float xCenter = ((float)(Block::DIMBLOCK * xBlock)) + halfDim;
     float yCenter = ((float)(Block::DIMBLOCK * yBlock)) + halfDim;
     float zCenter = ((float)(Block::DIMBLOCK * zBlock)) + halfDim;
@@ -144,6 +146,14 @@ std::vector<float> getVerteciesOfAFace(unsigned int xBlock, unsigned int yBlock,
             // std::cout << "TEX COORD for " << i << " - " <<j <<" coord: " << texCoord.first << " " << texCoord.second << std::endl;
             vertecies.push_back(texCoord.first);
             vertecies.push_back(texCoord.second);
+
+            // Sdding a single coefficent thath will be used to multiply the color of the face to make some sort of shadow
+
+            glm::vec3 dirAbs = glm::abs(dir);
+            float value = glm::length(dirAbs * coefficents);
+
+            //std::cout << "Direzione: " << dir.x <<" "<< dir.y <<" "<< dir.z <<" " << " Valore: " << value << std::endl;
+            vertecies.push_back(value);
 
         }
     }
@@ -298,6 +308,8 @@ PieceOfWorld::PieceOfWorld(std::pair<int, int> _pos, noise::module::Perlin& fina
     layout = std::shared_ptr<VertexBufferLayout> { new VertexBufferLayout{} };
     layout -> push<float>(3);
     layout -> push<float>(2);
+    // simple coefficient
+    layout -> push<float>(1);
 
     futBuffers = std::async(std::launch::async, genBuffers, blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain, vaData, ebData, vertexCounter, counterPieces, _lockBuffs);
 
@@ -310,7 +322,7 @@ void PieceOfWorld::bindBuffers() {
     // SIX indeces for each face
     eb -> updateData(&((*ebData)[0]), *vertexCounter * 6);
 
-    vb -> updateData(&((*vaData)[0]), (*vertexCounter * 4) * 5 * sizeof(float));
+    vb -> updateData(&((*vaData)[0]), (*vertexCounter * 4) * 6 * sizeof(float));
 
     va -> bindVb(*vb, *layout);
 
@@ -326,25 +338,22 @@ bool PieceOfWorld::isBlock(unsigned int x, unsigned int y, unsigned int z) {
 
 void PieceOfWorld::breakBlock(unsigned int x, unsigned int y, unsigned int z) {
 
-    std::cout << "Breaking a BLOCCK" <<std::endl;
-
-    auto itr = blocks -> erase(std::make_tuple(x, y, z));
-    if(itr == blocks -> end())
-        std::cout << "merda" <<std::endl;
-    else 
-        std::cout << "ok l'ho trovato" <<std::endl;
+    blocks -> erase(std::make_tuple(x, y, z));
     
     if(!futBuffers.valid()) {
+        vaData -> clear();
+        ebData -> clear();
         futBuffers = std::async(std::launch::async, genBuffers, blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain, vaData, ebData, vertexCounter, counterPieces, _lockBuffs);
-        std::cout << "Remake the world" <<std::endl;
     }
 }
 
 void PieceOfWorld::addBlock(unsigned int x, unsigned int y, unsigned int z, TypeOfBlock type) {
 
-    blocks -> insert(std::make_pair(std::make_tuple(x, y, z), type));
+    blocks -> replace(std::make_pair(std::make_tuple(x, y, z), type));
 
     if(!futBuffers.valid()) {
+        vaData -> clear();
+        ebData -> clear();
         futBuffers = std::async(std::launch::async, genBuffers, blocks, terrainBlocks, halfDim, xoffset, zoffset, xBlockOffset, zBlockOffset, cameraPos, futTerrain, vaData, ebData, vertexCounter, counterPieces, _lockBuffs);
     }
 }
@@ -364,6 +373,7 @@ std::shared_ptr<VertexArray> PieceOfWorld::getVertexArray() {
                     va = std::shared_ptr<VertexArray>{ new VertexArray{} };
 
                 bindBuffers();
+
         }
     }
 
