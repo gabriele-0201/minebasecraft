@@ -24,10 +24,3 @@ Ricapotolandololo:
 + Successivamente imposto le matrici view a projection in funzione della camera, quindi in funzione di quello che torna il Player
 
 + Ed infine chiamo il draw di GL
-
-# TODO
-
-[ ] - impostare tutta la classe player
-[ ] - Creare un correto vertex di ritorno dal world
-[ ] - in qualche modo combinare le due cose precedenti
-[ ] - NON far renderizzare facie tra pieceOfWorld
